@@ -2,4 +2,7 @@ staging/
 classes/
 gensrc/
 test.classes/
+target/
 
+/.gradle/
+/bin/

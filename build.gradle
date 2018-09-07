@@ -1,0 +1,91 @@
+// Needed for pre-compiling the JSPs
+buildscript {
+  repositories {
+    jcenter()
+  }
+    
+  dependencies {
+    classpath "com.bmuschko:gradle-tomcat-plugin:${gradleTomcatPluginVersion}"
+  }
+}
+
+allprojects {
+  apply plugin: "java"
+  apply plugin: "war"
+  apply plugin: "com.bmuschko.tomcat"
+  group = 'org.apereo.openequella.integration.blackboard'
+  version = buildingBlockVersion
+  repositories {
+    mavenCentral()
+      maven {
+        url "https://maven.blackboard.com/content/repositories/releases/"
+      }
+    }
+
+  dependencies {
+    providedCompile( "blackboard.platform:bb-platform:${bbLearnVersion}" ) { transitive = false }
+    providedCompile( "blackboard.platform:bb-cms-admin:${bbLearnVersion}" ) { transitive = false }
+    compile("javax.servlet:javax.servlet-api:${servletApiVersion}");
+    compile("javax.servlet.jsp:javax.servlet.jsp-api:${jspApiVersion}");
+    compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile group: 'org.apache.cxf', name: 'cxf-bundle', version: '2.7.18'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
+    compile group: 'org.apache.struts', name: 'struts-taglib', version: '1.3.10'
+ 
+  
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'com.google.guava:guava:23.0'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:${junitVersion}'
+  
+    // Needed to precompile the JSPs.
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",  
+      "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",  
+      "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}",
+      "blackboard.platform:bb-taglibs:${bbLearnVersion}",  
+      "blackboard.platform:bb-platform:${bbLearnVersion}",  
+      "javax.servlet:jstl:${jstlVersion}"  
+    }
+
+  war {
+    from 'build/jsps/org/apache/jsp' // this and the following exclude used to move the pre-compiled JSPs
+    from ('src/main/manifests/bb-manifest-unresolved.xml'){ // set the B2 version and place in the war
+      filter{ it.replaceAll('@VERSION@', buildingBlockVersion)}
+      rename { String fileName ->
+        fileName.replace("-unresolved", "")
+      }
+      into("WEB-INF")
+    }
+    exclude('org/**') // Clear out the jasper build
+    exclude('WEB-INF/org/**') // Clear out the jasper build
+  }
+  
+  tomcat {
+    jasper {
+      validateXml = true
+      outputDir = file("build/jsps")
+    }
+  } 
+
+  task cleanAndRebuild() {
+    group 'oEQ'
+    description 'Cleans the build, precompiles the JSPs, and packages the WAR file'
+    dependsOn clean
+    dependsOn tomcatJasper
+    dependsOn war
+  }
+}
+
+project(':oeqAudit') {
+  dependencies {
+    compile project(':oeqCommon')
+  }
+}
+ 
+project(':oeqPrimary') {
+  dependencies {
+    compile project(':oeqCommon')
+  }
+}
