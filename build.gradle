@@ -1,10 +1,10 @@
-// Needed for pre-compiling the JSPs
 buildscript {
   repositories {
     jcenter()
   }
     
   dependencies {
+    // Needed for pre-compiling the JSPs
     classpath "com.bmuschko:gradle-tomcat-plugin:${gradleTomcatPluginVersion}"
   }
 }
@@ -14,7 +14,7 @@ allprojects {
   apply plugin: "war"
   apply plugin: "com.bmuschko.tomcat"
   group = 'org.apereo.openequella.integration.blackboard'
-  version = buildingBlockVersion
+  version = artifactVersion
   repositories {
     mavenCentral()
       maven {
@@ -50,7 +50,7 @@ allprojects {
     }
 
   war {
-    from 'build/jsps/org/apache/jsp' // this and the following exclude used to move the pre-compiled JSPs
+    from 'build/jsps/org/apache/jsp' // include the pre-compiled JSPs
     from ('src/main/manifests/bb-manifest-unresolved.xml'){ // set the B2 version and place in the war
       filter{ it.replaceAll('@VERSION@', buildingBlockVersion)}
       rename { String fileName ->
@@ -58,8 +58,9 @@ allprojects {
       }
       into("WEB-INF")
     }
-    exclude('org/**') // Clear out the jasper build
-    exclude('WEB-INF/org/**') // Clear out the jasper build
+    from ('src/main/java/icons.xml') {
+      into("WEB-INF/classes")
+    }
   }
   
   tomcat {
@@ -68,24 +69,63 @@ allprojects {
       outputDir = file("build/jsps")
     }
   } 
+}
 
-  task cleanAndRebuild() {
+project(':oeqAuditB2') {
+  dependencies {
+    compile project(':oeqCommon')
+  }
+  
+  task buildB2() {
     group 'oEQ'
-    description 'Cleans the build, precompiles the JSPs, and packages the WAR file'
-    dependsOn clean
+    description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
+    dependsOn tomcatJasper
+    dependsOn war
+  }
+}
+ 
+project(':oeqPrimaryB2') {
+  dependencies {
+    compile project(':oeqCommon')
+  }
+
+  task buildB2() {
+    group 'oEQ'
+    description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
     dependsOn tomcatJasper
     dependsOn war
   }
 }
 
-project(':oeqAudit') {
+project(':oeqPrimaryWS') {
   dependencies {
     compile project(':oeqCommon')
   }
-}
- 
-project(':oeqPrimary') {
-  dependencies {
-    compile project(':oeqCommon')
+  
+  task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+  }
+  
+  task zipJavadoc(type: Zip, dependsOn: generateJavadoc) {
+    archiveName 'documentation.zip'
+    destinationDir buildDir
+    from ("${buildDir}/docs/javadoc") {
+      into 'documentation'
+    }
+  }
+
+  task buildWS(type: Jar) {
+    dependsOn classes
+    dependsOn zipJavadoc
+    group 'oEQ'
+    description 'Compiles the source and packages the web service as a JAR'
+    baseName = 'oeq-blackboard-primary-ws'
+    with jar
+    from (project(':oeqCommon').sourceSets.main.output) // Include the common classes as well.
+    from ('src/main/manifests/bb-manifest.xml'){ // set the B2 version and place in the war
+      into("META-INF")
+    }
+    from ('src/main/java/icons.xml')
+    from ("${buildDir}/documentation.zip")
   }
 }

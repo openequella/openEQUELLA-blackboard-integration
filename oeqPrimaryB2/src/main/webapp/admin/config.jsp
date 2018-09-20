@@ -156,25 +156,6 @@ int number = 1;
 				</bbng:dataElement>
 			</bbng:step>
 			
-			<%
-			//Show webservice download if on 9.1 or greater (until we know the version the BB bug is fixed in)
-			int major = BbUtil.getMajorVersionNumber(); 
-			if (major > 9 || major == 9 && BbUtil.getMinorVersionNumber() >= 1) {
-			%>
-			<bbng:step title="Web Service Download">
-					<bbng:dataElement label="">
-						<div>
-							<p>The web service is required to be installed for the Blackboard "External System Connector" within EQUELLA to function.</p>
-							<p>To install it you must download the web service jar and 
-						  		upload it under <a href="/webapps/ws/wsadmin/wsadmin">Web Service administration</a> and then set it to "Available".</p>
-						 </div>
-					</bbng:dataElement>
-					<bbng:dataElement>
-						<div>Download the <a href="../webservice.jar">web service jar</a></div>
-					</bbng:dataElement>
-			</bbng:step>
-			<% } %>
-			
 			<bbng:stepSubmit cancelUrl="../../blackboard/admin/manage_plugins.jsp" />
 		</bbng:dataCollection>
 	</form>

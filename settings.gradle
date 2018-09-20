@@ -1,2 +1,2 @@
-rootProject.name = 'oeq-building-block'
-include 'oeqAudit', 'oeqPrimary', 'oeqCommon'
+rootProject.name = 'oeq-blackboard-integration'
+include 'oeqAuditB2', 'oeqPrimaryB2', 'oeqCommon', 'oeqPrimaryWS'
