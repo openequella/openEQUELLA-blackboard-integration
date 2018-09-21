@@ -9,30 +9,41 @@ buildscript {
   }
 }
 
+plugins {
+  id 'nebula.lint' version '9.3.2'
+}
+
+
+
 allprojects {
   apply plugin: "java"
   apply plugin: "war"
   apply plugin: "com.bmuschko.tomcat"
-  group = 'org.apereo.openequella.integration.blackboard'
-  version = artifactVersion
+  apply plugin: 'nebula.lint'
+  
   repositories {
     mavenCentral()
-      maven {
-        url "https://maven.blackboard.com/content/repositories/releases/"
-      }
+    maven {
+      url "https://maven.blackboard.com/content/repositories/releases/"
     }
-
+  }
+    
+  group = 'org.apereo.openequella.integration.blackboard'
+  version = artifactVersion
+  
+  gradleLint.rules = ['all-dependency', 'dependency-parentheses', 'duplicate-dependency-class']
+  
   dependencies {
     providedCompile( "blackboard.platform:bb-platform:${bbLearnVersion}" ) { transitive = false }
     providedCompile( "blackboard.platform:bb-cms-admin:${bbLearnVersion}" ) { transitive = false }
-    compile("javax.servlet:javax.servlet-api:${servletApiVersion}");
-    compile("javax.servlet.jsp:javax.servlet.jsp-api:${jspApiVersion}");
+    providedCompile "javax.servlet:javax.servlet-api:${servletApiVersion}";
+    providedCompile "javax.servlet.jsp:javax.servlet.jsp-api:${jspApiVersion}";
     compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
     compile group: 'log4j', name: 'log4j', version: '1.2.17'
     compile group: 'org.apache.cxf', name: 'cxf-bundle', version: '2.7.18'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
     compile group: 'org.apache.struts', name: 'struts-taglib', version: '1.3.10'
- 
   
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:23.0'
@@ -47,12 +58,23 @@ allprojects {
       "blackboard.platform:bb-taglibs:${bbLearnVersion}",  
       "blackboard.platform:bb-platform:${bbLearnVersion}",  
       "javax.servlet:jstl:${jstlVersion}"  
-    }
+  }
 
-  war {
+  task buildWar (type: War, dependsOn: tomcatJasper) {
+    // Due to the tomcat embed and other deps being hardset on the classpath,
+    // we need to remove the unneeded ones.  This is not as clean as hoped,
+    // but keeps out unwanted jars from the war.
+    classpath = classpath.filter { file ->
+      (
+        !file.name.startsWith('jetty-') &&
+        !file.name.startsWith('geronimo-') &&
+        !file.name.startsWith('spring-')
+      )
+    }
+     
     from 'build/jsps/org/apache/jsp' // include the pre-compiled JSPs
     from ('src/main/manifests/bb-manifest-unresolved.xml'){ // set the B2 version and place in the war
-      filter{ it.replaceAll('@VERSION@', buildingBlockVersion)}
+      filter{ it.replaceAll('@VERSION@', artifactVersion)}
       rename { String fileName ->
         fileName.replace("-unresolved", "")
       }
@@ -79,8 +101,7 @@ project(':oeqAuditB2') {
   task buildB2() {
     group 'oEQ'
     description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
-    dependsOn tomcatJasper
-    dependsOn war
+    dependsOn buildWar
   }
 }
  
@@ -92,8 +113,7 @@ project(':oeqPrimaryB2') {
   task buildB2() {
     group 'oEQ'
     description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
-    dependsOn tomcatJasper
-    dependsOn war
+    dependsOn buildWar
   }
 }
 

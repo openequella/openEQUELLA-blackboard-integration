@@ -37,3 +37,9 @@ TODO
 
 ## Building the gbFixer building block
 TODO
+
+## Check (and fix) dependency issues
+```
+~$ ./gradlew generateGradleLintReport
+~$ ./gradlew fixGradleLint
+```
