@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="boorah" name="com.tle.blackboard.common.content.LegacyItemUtilTest" skipped="0" tests="18" time="0.162" timestamp="2017-04-27T01:13:23">
+  <properties>
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="bbstaging" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/staging/bblock/public_html" />
+    <property name="javac.source" value="1.8" />
+    <property name="java.home" value="/usr/lib/jvm/java-8-oracle/jre" />
+    <property name="ant.file.type.EQUELLA-Build" value="file" />
+    <property name="coverage.data" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/coverage.data" />
+    <property name="HTML Editor Plugins.base" value="/home/jolz/equella/Equella/Source/Integration/HTMLEditorPlugins" />
+    <property name="java.awt.headless" value="true" />
+    <property name="test.reports" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/test.reports" />
+    <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-8-oracle/jre/lib/endorsed" />
+    <property name="wsdoczipname" value="documentation.zip" />
+    <property name="tle.signer.certificate" value="/home/jolz/equella.keystore" />
+    <property name="TLE Active Cacher.base" value="/home/jolz/equella/Equella/Source/Tools/Cacher" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="java.version" value="1.8.0_121" />
+    <property name="Tool Dependencies.base" value="/home/jolz/equella/Equella/Source/Tools/ToolDependencies" />
+    <property name="javac.debug" value="on" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="ant.project.invoked-targets" value="product" />
+    <property name="ant.file.CustomTasks" value="/home/jolz/equella/Equella/Source/common-tasks.xml" />
+    <property name="Platform Commons.classes" value="/home/jolz/equella/Equella/Platform/Plugins/com.tle.platform.common/classes" />
+    <property name="user.name" value="jolz" />
+    <property name="Sakai.base" value="/home/jolz/equella/Equella/Source/Integration/Sakai" />
+    <property name="wsjarname" value="webservice.jar" />
+    <property name="External Dependencies.resource" value="External" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="TLE Plugins.base" value="/home/jolz/equella/Equella/Source/Plugins" />
+    <property name="javac.debuglevel" value="lines,vars,source" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="user.timezone" value="" />
+    <property name="wsbuild" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/classes" />
+    <property name="path.separator" value=":" />
+    <property name="Tool Dependencies.resource" value="ToolDependencies" />
+    <property name="ant.file.type.Blackboard 9 Building Block SP11+" value="file" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="ant.project.default-target" value="make" />
+    <property name="build" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/public_html/WEB-INF/classes" />
+    <property name="lib" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/public_html/WEB-INF/lib" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner com.tle.blackboard.common.content.LegacyItemUtilTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=true formatter=org.apache.tools.ant.taskdefs.optional.junit.OutErrSummaryJUnitResultFormatter showoutput=true outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/test.reports/TEST-com.tle.blackboard.common.content.LegacyItemUtilTest.xml crashfile=/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/junitvmwatcher589990655429259020.properties propsfile=/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/junit3738065759255909395.properties" />
+    <property name="ant.file.type.CustomTasks" value="file" />
+    <property name="EQUELLA Server.base" value="/home/jolz/equella/Equella/Source/Server/equellaserver" />
+    <property name="ant.file.com.tle.integration.blackboard" value="/home/jolz/equella/Equella/Source/Plugins/Integrations/com.tle.integration.blackboard/build.xml" />
+    <property name="ant.file" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/build.xml" />
+    <property name="TLE Common.base" value="/home/jolz/equella/Equella/Source/Plugins/Platform/com.tle.platform.equella" />
+    <property name="java.io.tmpdir" value="/tmp" />
+    <property name="user.language" value="en" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="ant.file.type" value="file" />
+    <property name="Blackboard Gateway.base" value="/home/jolz/equella/Equella/Source/Integration/Blackboard" />
+    <property name="product" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/product" />
+    <property name="javac.server.target" value="1.8" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="sun.desktop" value="gnome" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="tle.signer.alias" value="2015key" />
+    <property name="websrc" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/public_html" />
+    <property name="version.mm" value="6.4" />
+    <property name="javac.client.target" value="1.8" />
+    <property name="ant.file.common" value="/home/jolz/equella/Equella/Source/common-build.xml" />
+    <property name="git.bin.win32" value="git.exe" />
+    <property name="javac.server.source" value="1.8" />
+    <property name="version.mmr" value="6.4.r43" />
+    <property name="TLE Custom Build Tasks.base" value="/home/jolz/equella/Equella/Platform/Infrastructure/CustomBuildTasks" />
+    <property name="ant.file.EQUELLA-Build" value="/home/jolz/equella/Equella/build.xml" />
+    <property name="myclasspath" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/staging/webservice" />
+    <property name="this.dir" value="/home/jolz/equella/Equella/Source" />
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob" />
+    <property name="javac.client.source" value="1.8" />
+    <property name="javac.optimize" value="off" />
+    <property name="source.base" value="/home/jolz/equella/Equella" />
+    <property name="test.src" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/test" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.9.7 compiled on May 16 2016" />
+    <property name="ant.file.common-ant" value="/home/jolz/equella/Equella/Source/common-ant.xml" />
+    <property name="ant.file.type.common" value="file" />
+    <property name="ant.file.Blackboard 9 Building Block SP11+" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/build.xml" />
+    <property name="version.properties.destination" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/public_html/WEB-INF/classes" />
+    <property name="test.build" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/test.classes" />
+    <property name="os.name" value="Linux" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="git.bin.unix" value="/usr/bin/git" />
+    <property name="IntegrationPack.base" value="/home/jolz/equella/Equella/Source/Integration/IntegrationPack" />
+    <property name="TLE Installation Upgrader.base" value="/home/jolz/equella/Equella/Source/Tools/UpgradeInstallation" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="warname" value="equella-bb91.war" />
+    <property name="cache.created" value="true" />
+    <property name="TLE Common.classes" value="/home/jolz/equella/Equella/Source/Plugins/Platform/com.tle.platform.equella/classes" />
+    <property name="java.library.path" value="/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="basedir" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91" />
+    <property name="java.class.version" value="52.0" />
+    <property name="javac.nowarn" value="off" />
+    <property name="ant.home" value="/usr/share/ant" />
+    <property name="tests.enabled" value="true" />
+    <property name="Interface.base" value="/home/jolz/equella/Equella/Interface" />
+    <property name="staging" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/staging" />
+    <property name="TLE Upgrade Manager.base" value="/home/jolz/equella/Equella/Source/Tools/UpgradeManager" />
+    <property name="javac.depend" value="off" />
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-oracle/jre/lib/amd64" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment" />
+    <property name="wsdocstaging" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/staging/webservicedoc" />
+    <property name="TLE Installer.base" value="/home/jolz/equella/Equella/Installer" />
+    <property name="Platform.base" value="/home/jolz/equella/Equella/Source/Plugins/Platform" />
+    <property name="External Dependencies.base" value="/home/jolz/equella/Equella/Source/Plugins/External" />
+    <property name="ant.project.name" value="Blackboard 9 Building Block SP11+" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit" />
+    <property name="Integration.base" value="/home/jolz/equella/Equella/Source/Integration" />
+    <property name="sun.cpu.isalist" value="" />
+    <property name="java.ext.dirs" value="/usr/lib/jvm/java-8-oracle/jre/lib/ext:/usr/java/packages/lib/ext" />
+    <property name="os.version" value="4.8.0-49-generic" />
+    <property name="javac.compat.target" value="1.7" />
+    <property name="user.home" value="/home/jolz" />
+    <property name="Platform Swing UI.classes" value="/home/jolz/equella/Equella/Source/Plugins/Platform/com.tle.platform.swing/classes" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="user.dir" value="/home/jolz/equella/Equella" />
+    <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+    <property name="javac.compat.source" value="1.7" />
+    <property name="TLE Conversion.base" value="/home/jolz/equella/Equella/Source/Server/conversion" />
+    <property name="Platform Commons.base" value="/home/jolz/equella/Equella/Platform/Plugins/com.tle.platform.common" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="version.display" value="6.4-Alpha" />
+    <property name="version.commit" value="3a75a23" />
+    <property name="ant.file.EAR Builder" value="/home/jolz/equella/Equella/Source/build.xml" />
+    <property name="java.vm.version" value="25.121-b13" />
+    <property name="ant.file.type.EAR Builder" value="file" />
+    <property name="src.enabled" value="true" />
+    <property name="java.class.path" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/public_html/WEB-INF/classes:/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/test.classes:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/cxf-bundle-2.7.6.jar:/home/jolz/equella/Equella/Source/Plugins/External/guava-16.0.1.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/commons-codec-1.10.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/tomcat-servlet-api-8.0.15.jar:/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/classes:/home/jolz/equella/Equella/Source/Plugins/External/jackson-databind-2.3.1.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/jdom-1.0.jar:/home/jolz/equella/Equella/Source/Plugins/External/neethi-3.0.2.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/bb-platform-9.1.201410.160373.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/commons-httpclient-3.1.jar:/home/jolz/equella/Equella/Source/Plugins/External/woodstox-core-asl-4.2.0.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/log4j-1.2.17.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/slf4j-api-1.7.5.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/jackson-core-2.3.4.jar:/home/jolz/equella/Equella/Source/Tools/ToolDependencies/jsp-api-5.5.23.jar:/home/jolz/equella/Equella/Source/Plugins/External/slf4j-log4j12-1.6.1.jar:/home/jolz/equella/Equella/Source/Plugins/External/xmlschema-core-2.0.3.jar:/home/jolz/equella/Equella/Platform/Infrastructure/CustomBuildTasks/lib/junit.jar:/usr/share/java/ant-launcher-1.9.7.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit.jar:/usr/share/ant/lib/ant-junit4.jar" />
+    <property name="tle.signer.password" value="dytech010" />
+    <property name="ant.library.dir" value="/usr/share/ant/lib" />
+    <property name="os.arch" value="amd64" />
+    <property name="javac.deprecation" value="on" />
+    <property name="gensrc" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/gensrc" />
+    <property name="ant.file.type.com.tle.integration.blackboard" value="file" />
+    <property name="TLE Custom Build Tasks.resource" value="CustomBuildTasks" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="ant.core.lib" value="/usr/share/ant/lib/ant.jar" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.file.All Plugins" value="/home/jolz/equella/Equella/Source/Plugins/build/build.xml" />
+    <property name="file.separator" value="/" />
+    <property name="java.runtime.version" value="1.8.0_121-b13" />
+    <property name="plugin.id" value="Blackboard Building Block 9 SP11+" />
+    <property name="sun.boot.class.path" value="/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes" />
+    <property name="ant.file.type.All Plugins" value="file" />
+    <property name="plugin.version" value="1.0.0" />
+    <property name="user.country" value="AU" />
+    <property name="TLE Custom Build Tasks.classes" value="/home/jolz/equella/Equella/Platform/Infrastructure/CustomBuildTasks/classes" />
+    <property name="ant.file.type.common-ant" value="file" />
+    <property name="TLE Import Export Utils.base" value="/home/jolz/equella/Equella/Source/Tools/ImportExportUtils" />
+    <property name="src" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/src" />
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="javac.target" value="1.8" />
+    <property name="wsstaging" value="/home/jolz/equella/Equella/Source/Integration/Blackboard/bb91/staging/webservice" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="javac.verbose" value="no" />
+    <property name="sun.arch.data.model" value="64" />
+  </properties>
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testCreatePropBagWithAmpersands" time="0.073" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testCreatePropBagWithXmlEscapedCharacters" time="0.013" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testCreatePropBagWithoutAmpersands" time="0.001" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageSoloSpace" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageSoloEncodedPlus" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageSoloPlus" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageSoloSlash" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageSoloPreEncodedSlash" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageOnlyFilename" time="0.009" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageFolderAndFilename" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageOnlyFolder" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageNullPage" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testScrubLegacyPageDotSlashPage" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testFixUnescapedAmpersandsSingle" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testFixUnescapedAmpersandsXml" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testFixUnescapedAmpersandsEmpty" time="0.0" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testFixUnescapedAmpersandsMultiples" time="0.001" />
+  <testcase classname="com.tle.blackboard.common.content.LegacyItemUtilTest" name="testFixUnescapedAmpersandsGeneral" time="0.0" />
+  <system-out><![CDATA[URI parser output [I%2Fam%20a%20spacey%20filename%20!#$&'%()*+,:;=?@[].jpg]
+]]></system-out>
+  <system-err><![CDATA[[Fatal Error] :1:188: The entity name must immediately follow the '&' in the entity reference.
+[Fatal Error] :1:183: The entity name must immediately follow the '&' in the entity reference.
+]]></system-err>
+</testsuite>

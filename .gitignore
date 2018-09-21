@@ -2,4 +2,12 @@ staging/
 classes/
 gensrc/
 test.classes/
+target/
+.gradle/
+bin/
+build/
+*.licensed
+.settings/
+.project
+.classpath
 
