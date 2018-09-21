@@ -3,7 +3,11 @@ classes/
 gensrc/
 test.classes/
 target/
-
-/.gradle/
-/bin/
+.gradle/
+bin/
+build/
 *.licensed
+.settings/
+.project
+.classpath
+
