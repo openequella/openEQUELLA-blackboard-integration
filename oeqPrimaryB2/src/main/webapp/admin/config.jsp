@@ -11,9 +11,9 @@
 <%@page import="blackboard.platform.session.BbSessionManagerService"%>
 <%@page import="blackboard.platform.BbServiceManager"%>
 <%@page import="blackboard.platform.context.ContextManager"%>
-<%@page import="com.tle.blackboard.buildingblock.data.WrappedUser"%>
-<%@page import="com.tle.blackboard.buildingblock.Configuration"%>
-<%@page import="com.tle.blackboard.common.BbUtil"%>
+<%@page import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser"%>
+<%@page import="org.apereo.openequella.integration.blackboard.buildingblock.Configuration"%>
+<%@page import="org.apereo.openequella.integration.blackboard.common.BbUtil"%>
 <%@ taglib uri="/bbNG" prefix="bbng"%>
 <%@ taglib uri="/tle" prefix="tle"%>
 
