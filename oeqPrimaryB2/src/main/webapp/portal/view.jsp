@@ -5,7 +5,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page
-	import="com.tle.blackboard.buildingblock.data.WrappedUser,com.tle.blackboard.buildingblock.data.WrappedUser.TaskLink" %>
+	import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser,org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser.TaskLink" %>
 
 <%@taglib uri="http://struts.apache.org/tags-nested" prefix="n"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
@@ -17,11 +17,11 @@
 WrappedUser user;
 private String link(String path) throws Exception
 {
-	String equellaUrl =  com.tle.blackboard.buildingblock.Configuration.instance().getEquellaUrl();
+	String equellaUrl =  org.apereo.openequella.integration.blackboard.buildingblock.Configuration.instance().getEquellaUrl();
 	String p = path;
 	if (!path.startsWith(equellaUrl))
 	{
-		p = com.tle.blackboard.common.PathUtils.urlPath(com.tle.blackboard.buildingblock.Configuration.instance().getEquellaUrl(), path);
+		p = org.apereo.openequella.integration.blackboard.common.PathUtils.urlPath(org.apereo.openequella.integration.blackboard.buildingblock.Configuration.instance().getEquellaUrl(), path);
 	}
 	if (p.indexOf('?') == -1)
 	{
@@ -38,7 +38,7 @@ private String link(String path) throws Exception
 String rel = null;
 String dir = null;
 user = WrappedUser.getUser(request);
-rel = com.tle.blackboard.common.BbUtil.getBlockRelativePath();
+rel = org.apereo.openequella.integration.blackboard.common.BbUtil.getBlockRelativePath();
 dir = rel + "portal/";
 try
 {

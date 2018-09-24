@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page contentType="text/html;charset=UTF-8" errorPage="/error.jsp" %>
-<%@page	import="com.tle.blackboard.buildingblock.data.WrappedContent" %>
-<%@page	import="com.tle.blackboard.common.BbUtil" %>
+<%@page	import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent" %>
+<%@page	import="org.apereo.openequella.integration.blackboard.common.BbUtil" %>
 
 <%@ taglib uri="/bbNG" prefix="bbng"%>
 <%@ taglib uri="/tle" prefix="tle"%>
@@ -19,8 +19,8 @@
 		</bbng:pageHeader>
 	
 		<form name="the_form" action="modify_proc.jsp" method="post">
-			<input type="hidden" name="<%=com.tle.blackboard.common.BbUtil.CONTENT_ID%>" value="<%=content.getId().toExternalString()%>">
-			<input type="hidden" name="<%=com.tle.blackboard.common.BbUtil.COURSE_ID%>" value="<%=content.getCourse().getId().toExternalString()%>">
+			<input type="hidden" name="<%=org.apereo.openequella.integration.blackboard.common.BbUtil.CONTENT_ID%>" value="<%=content.getId().toExternalString()%>">
+			<input type="hidden" name="<%=org.apereo.openequella.integration.blackboard.common.BbUtil.COURSE_ID%>" value="<%=content.getCourse().getId().toExternalString()%>">
 			
 			<bbng:dataCollection>
 				<bbng:step title="Content Information">
