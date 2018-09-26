@@ -43,3 +43,10 @@ TODO
 ~$ ./gradlew generateGradleLintReport
 ~$ ./gradlew fixGradleLint
 ```
+
+## Logging
+### Self / Managed Hosting
+Logs to bb-services.txt.  The Building Block Settings page will list the log file as well.
+
+### SaaS
+Logs to Kibana.  Search for `oeqInteg`.  The default graph won't provide the rows, so hover over the bottom rectangle on the left-hand side of the Kibana Learn interface (should be green) to Add Panel.  Select Table and 'selected' queries.  

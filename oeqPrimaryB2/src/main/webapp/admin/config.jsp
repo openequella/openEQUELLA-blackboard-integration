@@ -14,6 +14,7 @@
 <%@page import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser"%>
 <%@page import="org.apereo.openequella.integration.blackboard.buildingblock.Configuration"%>
 <%@page import="org.apereo.openequella.integration.blackboard.common.BbUtil"%>
+<%@page import="org.apereo.openequella.integration.blackboard.common.BbLogger"%>
 <%@ taglib uri="/bbNG" prefix="bbng"%>
 <%@ taglib uri="/tle" prefix="tle"%>
 
@@ -90,12 +91,14 @@ String clientSecret = configuration.getOauthClientSecret();
 String secretId = configuration.getSecretId();
 String secret = configuration.getSecret();
 String restriction = configuration.getRestriction();
+String logLevel = configuration.getLogLevel();
 boolean newWindow = configuration.isNewWindow();
+String loggingDetails = BbLogger.instance().getLoggingDetails();
 
 String title = "EQUELLA Server Configuration";
 int number = 1;
 %>
-<bbng:genericPage title="EQUELLA Configuration">
+<bbng:genericPage title="openEQUELLA Configuration">
 	<bbng:breadcrumbBar navItem="admin_plugin_manage" environment="SYS_ADMIN">
 		<bbng:breadcrumb title="<%=title%>" />
 	</bbng:breadcrumbBar>
@@ -142,25 +145,40 @@ int number = 1;
 			</bbng:step>
 			
 			<bbng:step title="Options">
-				<bbng:dataElement label="Restrict selection of EQUELLA content">
-					<bbng:selectElement name="<%=Configuration.RESTRICTIONS %>" >
-						<bbng:selectOptionElement value="none" optionLabel="No restrictions" isSelected="<%=restriction.equals(\"none\") %>"/>
-						<bbng:selectOptionElement value="itemonly" optionLabel="Items only" isSelected="<%=restriction.equals(\"itemonly\") %>"/>
-						<bbng:selectOptionElement value="attachmentonly" optionLabel="Attachments only" isSelected="<%=restriction.equals(\"attachmentonly\") %>"/>
-						<bbng:selectOptionElement value="packageonly" optionLabel="Packages only" isSelected="<%=restriction.equals(\"packageonly\") %>"/>	
-					</bbng:selectElement>
-				</bbng:dataElement>
-				
-				<bbng:dataElement label="Default new EQUELLA content to open in a new window">
-					<bbng:checkboxElement name="<%=Configuration.NEWWINDOW%>" value="true" isSelected="<%=newWindow%>" />
-				</bbng:dataElement>
-			</bbng:step>
-			
-			<bbng:stepSubmit cancelUrl="../../blackboard/admin/manage_plugins.jsp" />
+        <bbng:dataElement label="Restrict selection of EQUELLA content">
+          <bbng:selectElement name="<%=Configuration.RESTRICTIONS %>" >
+            <bbng:selectOptionElement value="none" optionLabel="No restrictions" isSelected="<%=restriction.equals(\"none\") %>"/>
+            <bbng:selectOptionElement value="itemonly" optionLabel="Items only" isSelected="<%=restriction.equals(\"itemonly\") %>"/>
+            <bbng:selectOptionElement value="attachmentonly" optionLabel="Attachments only" isSelected="<%=restriction.equals(\"attachmentonly\") %>"/>
+            <bbng:selectOptionElement value="packageonly" optionLabel="Packages only" isSelected="<%=restriction.equals(\"packageonly\") %>"/>  
+          </bbng:selectElement>
+        </bbng:dataElement>
+      
+        <bbng:dataElement label="Override Logging Level of Integration">
+          <bbng:selectElement name="<%=Configuration.LOG_LEVEL %>" >
+            <bbng:selectOptionElement value="NotSet" optionLabel="Not Set" isSelected="<%=logLevel.equals(\"NotSet\") %>"/>
+            <bbng:selectOptionElement value="Warn" optionLabel="Warn" isSelected="<%=logLevel.equals(\"Warn\") %>"/>
+            <bbng:selectOptionElement value="Info" optionLabel="Info" isSelected="<%=logLevel.equals(\"Info\") %>"/>
+            <bbng:selectOptionElement value="Debug" optionLabel="Debug" isSelected="<%=logLevel.equals(\"Debug\") %>"/>  
+            <bbng:selectOptionElement value="SqlTrace" optionLabel="SQL Trace" isSelected="<%=logLevel.equals(\"SqlTrace\") %>"/>
+            <bbng:selectOptionElement value="Trace" optionLabel="Trace" isSelected="<%=logLevel.equals(\"Trace\") %>"/>
+          </bbng:selectElement>
+        </bbng:dataElement>
+        
+        <bbng:dataElement label="Default new EQUELLA content to open in a new window">
+          <bbng:checkboxElement name="<%=Configuration.NEWWINDOW%>" value="true" isSelected="<%=newWindow%>" />
+        </bbng:dataElement>
+      </bbng:step>
+      
+      <bbng:stepSubmit cancelUrl="../../blackboard/admin/manage_plugins.jsp" />
 		</bbng:dataCollection>
 	</form>
 	
 	<div style="font-size: 8pt; color: #C0C0C0">
-		<%=version%>
-	</div>
+    <%=version%>
+  </div>
+  
+  <div style="font-size: 8pt; color: #C0C0C0">
+    Logging:  <%=loggingDetails%>
+  </div>
 </bbng:genericPage>
