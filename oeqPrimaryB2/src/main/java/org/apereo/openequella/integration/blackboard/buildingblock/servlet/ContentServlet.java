@@ -14,25 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import blackboard.data.ExtendedData;
-import blackboard.data.content.Content;
-import blackboard.data.course.Course;
-import blackboard.data.course.CourseMembership;
-import blackboard.data.gradebook.impl.OutcomeDefinition;
-import blackboard.persist.Id;
-import blackboard.persist.content.ContentDbLoader;
-import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.gradebook.impl.OutcomeDefinitionDbLoader;
-import blackboard.platform.ContentWrapperHelper;
-import blackboard.platform.blti.BasicLTILauncher.IdTypeToSend;
-import blackboard.platform.plugin.PlugInUtil;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import org.apereo.openequella.integration.blackboard.buildingblock.BlockUtil;
 import org.apereo.openequella.integration.blackboard.buildingblock.Configuration;
 import org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent;
@@ -46,6 +27,26 @@ import org.apereo.openequella.integration.blackboard.common.content.ContentUtil;
 import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
 import org.apereo.openequella.integration.blackboard.common.content.ItemUtil;
 import org.apereo.openequella.integration.blackboard.common.content.LegacyItemUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+
+import blackboard.data.ExtendedData;
+import blackboard.data.content.Content;
+import blackboard.data.course.Course;
+import blackboard.data.course.CourseMembership;
+import blackboard.data.gradebook.impl.OutcomeDefinition;
+import blackboard.persist.Id;
+import blackboard.persist.content.ContentDbLoader;
+import blackboard.persist.course.CourseMembershipDbLoader;
+import blackboard.persist.gradebook.impl.OutcomeDefinitionDbLoader;
+import blackboard.platform.ContentWrapperHelper;
+import blackboard.platform.blti.BasicLTILauncher.IdTypeToSend;
+import blackboard.platform.plugin.PlugInUtil;
 
 @SuppressWarnings("nls")
 public class ContentServlet extends HttpServlet {
@@ -180,7 +181,7 @@ public class ContentServlet extends HttpServlet {
 			// response.sendRedirect(redirect.toString());
 		} catch (final Exception e) {
 			BbLogger.instance().logError("Error in ViewContent", e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -223,7 +224,11 @@ public class ContentServlet extends HttpServlet {
 
 			final FixedBasicLtiLauncher launcher = FixedBasicLtiLauncher.newLauncher(configuration, launchUrl,
 					contentId.toExternalString());
+			BbLogger.instance()
+					.logTrace("viewContentBody - created launcher.  URL=[" + launchUrl + "] and contentId=[" + contentId + "]");
+
 			launcher.addResourceLinkInformation(name, description);
+			BbLogger.instance().logTrace("viewContentBody - added name=[" + name + "] and description=[" + description + "]");
 
 			// Check course membership as supplied from the gradebook
 			final CourseMembership membership = getCourseMembershipFromRequest(request);
@@ -231,16 +236,23 @@ public class ContentServlet extends HttpServlet {
 				launcher.addGradingInformation(request, content);
 				launcher.addCurrentUserInformation(true, true, true, IdTypeToSend.PK1);
 			} else {
-				launcher.addGradingInformation(bbContent, membership);
+				launcher.addGradingInformation(request, bbContent, membership);
 				launcher.addUserInformation(membership.getUser(), membership, true, true, true, IdTypeToSend.PK1);
 			}
+			BbLogger.instance().logTrace("viewContentBody - added grading and user info");
 
+			BbLogger.instance().logTrace("viewContentBody - added current course information");
 			launcher.addCurrentCourseInformation(IdTypeToSend.PK1);
-			launcher.addReturnUrl(getReturnUrl(request, contentId, courseId));
+			String rUrl = getReturnUrl(request, contentId, courseId);
+			BbLogger.instance().logTrace("viewContentBody - set return url to: " + rUrl);
+			launcher.addReturnUrl(rUrl);
+			BbLogger.instance().logTrace("viewContentBody - launching");
 			launcher.launch(request, response, false, null);
+			BbLogger.instance().logTrace("viewContentBody - launched content");
+
 		} catch (final Exception e) {
 			BbLogger.instance().logError("Error in ContentBody viewer", e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -423,7 +435,7 @@ public class ContentServlet extends HttpServlet {
 			response.sendRedirect(contentReturnUrl);
 		} catch (final Exception e) {
 			BbLogger.instance().logError("Error in AddContent", e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		} finally {
 			Thread.currentThread().setContextClassLoader(oldLoader);
 		}

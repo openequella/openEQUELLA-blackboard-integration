@@ -1,20 +1,20 @@
 <?xml version = '1.0' encoding = 'windows-1252'?>
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
 <web-app>
-	<display-name>EQUELLA</display-name>
-	<description>EQUELLA Integration with Blackboard</description>
+	<display-name>openEQUELLA</display-name>
+	<description>openEQUELLA Integration with Blackboard</description>
 
 	<servlet>
 		<servlet-name>Redirect</servlet-name>
 		<servlet-class>
-			com.tle.blackboard.buildingblock.servlet.RedirectServlet
+			org.apereo.openequella.integration.blackboard.buildingblock.servlet.RedirectServlet
 		</servlet-class>
 	</servlet>
 
 	<servlet>
 		<servlet-name>Content</servlet-name>
 		<servlet-class>
-			com.tle.blackboard.buildingblock.servlet.ContentServlet
+			org.apereo.openequella.integration.blackboard.buildingblock.servlet.ContentServlet
 		</servlet-class>
 	</servlet>
 <!-- 

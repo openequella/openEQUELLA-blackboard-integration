@@ -1,11 +1,22 @@
 package org.apereo.openequella.integration.blackboard.common;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import blackboard.platform.log.LogService;
 import blackboard.platform.log.LogServiceFactory;
 
 // Wraps the common logger, and exposes the ability to soft 'change'
 // Logging Levels
 public class BbLogger {
+
+	// public static void main(String[] args) {
+	// Map<String, String> m = new HashMap<>();
+	// m.put("key1", "value1");
+	// for (Entry<String, String> e : m.entrySet()) {
+	// System.out.println("K=[" + e.getKey() + "], V=[" + e.getValue() + "]");
+	// }
+	// }
 
 	private static final String SIG = "oeqInteg - ";
 	private static final LogService LOGGER = LogServiceFactory.getInstance();
@@ -43,12 +54,19 @@ public class BbLogger {
 		logLevel = level;
 	}
 
-	public void logTrace(String msg) {
-		if (logLevel == LogLevel.NotSet) {
-			LOGGER.logAudit(SIG + msg);
-		} else if (logLevel == LogLevel.Trace) {
-			LOGGER.logWarning(SIG + "Trace - " + msg);
+	public void logTrace(String msg, Map<String, String> m) {
+		logTrace(msg);
+		for (Entry<String, String> e : m.entrySet()) {
+			logTrace("K=[" + e.getKey() + "], V=[" + e.getValue() + "]");
 		}
+	}
+
+	public void logTrace(String msg) {
+		// if (logLevel == LogLevel.NotSet) {
+		// LOGGER.logAudit(SIG + msg);
+		// } else if (logLevel == LogLevel.Trace) {
+		LOGGER.logWarning(SIG + "Trace - " + msg);
+		// }
 	}
 
 	public void logSqlTrace(String msg) {

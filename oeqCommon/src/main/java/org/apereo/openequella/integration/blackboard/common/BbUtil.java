@@ -33,8 +33,8 @@ import com.google.common.base.Throwables;
 @SuppressWarnings("nls")
 // @NonNullByDefault
 public class BbUtil {
-	public static final String HANDLE = "oeqPrimary";
-	public static final String VENDOR = "aper";
+	public static final String HANDLE = "tle";
+	public static final String VENDOR = "dych";
 	public static final String CONTENT_HANDLER = "resource/tle-resource";
 	public static final String CONTEXT_TAG = "@X@";
 	public static final String CONTENT_ID = "content_id";

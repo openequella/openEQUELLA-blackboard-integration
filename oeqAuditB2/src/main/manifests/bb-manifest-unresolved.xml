@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 	<plugin>
-		<name value="openEQUELLA B2 Auditor Plugin"/>
+		<name value="openEQUELLA Auditor"/>
 		<handle value="oeqAudit"/>
 		<description value="Runs a simple audit of the Blackboard environment wrt openEQUELLA"/>
 		<version value="@VERSION@"/>

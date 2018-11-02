@@ -284,19 +284,31 @@ public class WrappedUser {
 		WrappedUser suser = null;
 		try {
 			suser = (WrappedUser) request.getSession().getAttribute("TLE_USER");
-
+			String username = "user is null";
+			if (suser != null)
+				username = suser.getUsername();
+			BbLogger.instance()
+					.logWarn("oeqIntegStatelessIssue - getUser requesting TLE_USER from session.  Received: " + username);
 			// Have probably been logged out...
 			if (suser != null && !user.getId().equals(suser.getId())) {
+				BbLogger.instance()
+						.logWarn("oeqIntegStatelessIssue - getUser mismatched user IDs.  " + "session=[ID="
+								+ suser.getId().getExternalString() + ", username=" + suser.getId().getExternalString() + "], context="
+								+ "[ID=" + suser.getId().getExternalString() + ", username=" + suser.getId().getExternalString() + "]");
 				suser = null;
 			}
 		} catch (final Exception cce) {
 			suser = null;
 			// When BB gets redeployed this will happen
+			BbLogger.instance().logWarn("oeqIntegStatelessIssue - Attempted to getUser but session TLE_USER was null.");
+
 		}
 
 		if (suser == null) {
 			suser = user;
 			request.getSession().setAttribute("TLE_USER", user);
+			BbLogger.instance()
+					.logWarn("oeqIntegStatelessIssue - getUser setting TLE_USER from session as " + user.getUsername());
 		}
 		return suser;
 	}

@@ -68,7 +68,8 @@ allprojects {
       (
         !file.name.startsWith('jetty-') &&
         !file.name.startsWith('geronimo-') &&
-        !file.name.startsWith('spring-')
+        !file.name.startsWith('spring-') &&
+        !file.name.startsWith('serializer-')        
       )
     }
      

@@ -5,6 +5,8 @@
 <%@ taglib uri="/bbNG" prefix="bbng"%>
 <%@ taglib uri="/tle" prefix="tle"%>
 
+<%-- Handles the 'save' from edit a resource content object (fancy way of saying oEQ link in Bb) --%>
+
 <tle:context>
 	<%
 		WrappedContent content = new WrappedContent(request);
@@ -12,7 +14,7 @@
 		content.persist(request);
 	%>
 
-	<bbng:learningSystemPage title="Modify Resource Centre Object">
+	<bbng:learningSystemPage title="Modify openEQUELLA Object Link">
 		<bbng:breadcrumbBar environment="COURSE" isContent="true" />
 
 		<bbng:receipt type="SUCCESS" title="Content Updated"

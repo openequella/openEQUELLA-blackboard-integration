@@ -444,7 +444,6 @@ public class WrappedContent implements Comparable<WrappedContent> {
 			BbLogger.instance().logTrace("displayUntilString=" + displayUntilString);
 			BbLogger.instance().logTrace("newWindowString=" + newWindowString);
 
-			// Kill legacy shiite.
 			killLegacyFields();
 
 			setTitle(name);

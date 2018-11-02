@@ -16,6 +16,8 @@ Ensure the version on the settings page is the same version as in the war filena
 
 ## Access Existing Integration Link
 
+## Edit Integration Link
+
 ## Add openEQUELLA Module
 
 ## Course Tools > openEQUELLA Contribute

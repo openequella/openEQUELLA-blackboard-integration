@@ -2,11 +2,13 @@
 <manifest>
   <webservice>
     <name value="EQUELLA.WS"/>
-    <description value="EQUELLA web service for use with LMS connectors in EQUELLA" />
+    <description value="EQUELLA web service for use with LMS connectors in openEQUELLA" />
     <permissions>
-      <permission type="attribute" name="com.tle.*" actions="get,set"/>
-      <permission type="attribute" name="com.dytech.*" actions="get,set"/>
-      <permission type="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+      <permission type="attribute" name="org.aperep.openequella.*" actions="get,set"/>
+      <permission type="java.io.FilePermission" name="${java.home}/-" actions="read"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/-" actions="read,write,delete"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/apps/tomcat/temp/-"  actions="read,write,delete" />
+      <permission type="java.io.FilePermission" name="BB_CONTENT/-" actions="read,write,delete"/>
        <permission type="persist" name="Content" actions="create,modify,delete"/>
        <permission type="persist" name="GradableItem" actions="create,modify,delete" />
 	   <permission type="persist" name="BasicLTIPlacement" actions="create,modify,delete" />
