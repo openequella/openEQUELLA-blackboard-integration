@@ -1,7 +1,5 @@
 package org.apereo.openequella.integration.blackboard.webservice.impl;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,18 +11,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-
-import blackboard.data.ExtendedData;
-import blackboard.data.content.Content;
-import blackboard.persist.Id;
-import blackboard.persist.PersistenceException;
-import blackboard.persist.content.ContentDbLoader;
-import blackboard.platform.security.Entitlement;
-import blackboard.platform.security.SecurityUtil;
-import blackboard.platform.ws.AxisHelpers;
-import blackboard.platform.ws.WebserviceContext;
-import blackboard.platform.ws.WebserviceException;
-import blackboard.platform.ws.anns.AuthenticatedMethod;
 
 import org.apereo.openequella.integration.blackboard.common.BbUtil;
 import org.apereo.openequella.integration.blackboard.common.content.ContentUtil;
@@ -41,6 +27,17 @@ import org.apereo.openequella.integration.blackboard.webservice.EquellaWebservic
 import org.apereo.openequella.integration.blackboard.webservice.Folder;
 import org.apereo.openequella.integration.blackboard.webservice.SearchResult;
 
+import blackboard.data.ExtendedData;
+import blackboard.data.content.Content;
+import blackboard.persist.Id;
+import blackboard.persist.PersistenceException;
+import blackboard.persist.content.ContentDbLoader;
+import blackboard.platform.security.Entitlement;
+import blackboard.platform.security.SecurityUtil;
+import blackboard.platform.ws.WebserviceContext;
+import blackboard.platform.ws.WebserviceException;
+import blackboard.platform.ws.anns.AuthenticatedMethod;
+
 /**
  * Why is it called ZEquellaWebserviceImpl? Unfortunately this class must be the
  * last entry in the zip file, otherwise you are screwed. It is also not allowed
@@ -53,8 +50,7 @@ import org.apereo.openequella.integration.blackboard.webservice.SearchResult;
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class ZEquellaWebserviceImpl implements EquellaWebservice {
   private static final int CURRENT_EQUELLA_WS_VERSION = 3;
-  private static final boolean DEV = false;
-
+  
   // private static final String THIS_WS_NAME = "EQUELLA";
 
   /**
@@ -102,7 +98,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       for (blackboard.data.course.Course bbcourse : WebServiceUtil
           .getBbCourses(modifiableOnly ? session.getUserId() : null)) {
         if (!modifiableOnly
-            || canCreate(coursesWithCreate, bbcourse.getId()) && (archived || bbcourse.getIsAvailable())) {
+            || WsHelper.canCreate(coursesWithCreate, bbcourse.getId()) && (archived || bbcourse.getIsAvailable())) {
           courses.add(WebServiceUtil.convertCourse(bbcourse));
         }
       }
@@ -111,21 +107,9 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ005");
+      WsHelper.chuckIt(t, "EQ005");
       return null;
     }
-  }
-
-  private boolean canCreate(Set<Id> coursesWithCreate, Id courseId) {
-    if (coursesWithCreate == null) {
-      return true;
-    }
-    for (Id id : coursesWithCreate) {
-      if (id.toExternalString().equals(courseId.toExternalString())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
@@ -142,7 +126,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ006");
+      WsHelper.chuckIt(t, "EQ006");
       return null;
     }
   }
@@ -163,7 +147,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ007");
+      WsHelper.chuckIt(t, "EQ007");
       return null;
     }
   }
@@ -193,7 +177,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
 
       final Set<Id> coursesWithCreate = SecurityUtil.getCourseIdsWithEntitlement(session.getUserId(),
           new Entitlement("course.content.CREATE"));
-      if (!canCreate(coursesWithCreate, courseBbId)) {
+      if (!WsHelper.canCreate(coursesWithCreate, courseBbId)) {
         throw new PermissionException(
             "course.content.CREATE not granted for the user " + username + " and course " + courseId);
       }
@@ -223,13 +207,13 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (PermissionException p) {
-      chuckIt(p, "EQ100");
+      WsHelper.chuckIt(p, "EQ100");
       return null;
     } catch (PersistenceException e) {
-      chuckIt(e, "EQ003");
+      WsHelper.chuckIt(e, "EQ003");
       return null;
     } catch (Exception t) {
-      chuckIt(t, "EQ004");
+      WsHelper.chuckIt(t, "EQ004");
       return null;
     } finally {
       Thread.currentThread().setContextClassLoader(oldLoader);
@@ -269,7 +253,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
           continue;
         }
 
-        final Folder folder = getFolder(session, folderMap, course, key.getFolderId());
+        final Folder folder = WsHelper.getFolder(session, folderMap, course, key.getFolderId());
         if (folder == null) {
           // WebServiceUtil.debug("Unrecording " + key +
           // " because folder no longer exists");
@@ -288,7 +272,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ011");
+      WsHelper.chuckIt(t, "EQ011");
       return null;
     }
   }
@@ -331,7 +315,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
           continue;
         }
 
-        final Folder folder = getFolder(session, folderMap, course, key.getFolderId());
+        final Folder folder = WsHelper.getFolder(session, folderMap, course, key.getFolderId());
         if (folder == null) {
           continue;
         }
@@ -360,28 +344,11 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ011");
+      WsHelper.chuckIt(t, "EQ011");
       return null;
     } finally {
       Thread.currentThread().setContextClassLoader(oldLoader);
     }
-  }
-
-  private Folder getFolder(BbWsSession session, Map<String, Folder> folderMap, Course course, String folderId)
-      throws PersistenceException {
-    Folder folder = folderMap.get(folderId);
-    if (folder == null) {
-      // WebServiceUtil.debug("Folder " + folderId +
-      // " not found in map, loading it");
-      Content bbFolder = session.loadContent(folderId);
-      if (bbFolder != null) {
-        folder = WebServiceUtil.convertFolder(bbFolder, course.getId());
-        folderMap.put(folderId, folder);
-      } else {
-        WebServiceUtil.debug("Folder could not be loaded.  It doesn't exist any more!");
-      }
-    }
-    return folder;
   }
 
   @Override
@@ -406,7 +373,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ012");
+      WsHelper.chuckIt(t, "EQ012");
       return null;
     }
   }
@@ -421,7 +388,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       final BbWsSession session = new BbWsSession(WebserviceContext.getCurrentSession());
       if (contentId != null) {
         final Content content = session.loadContent(contentId);
-        ensurePermission(session, content.getCourseId(), "course.content.DELETE");
+        WsHelper.ensurePermission(session, content.getCourseId(), "course.content.DELETE");
 
         session.deleteContent(contentId);
         RegistrationUtil.unrecordItem(0, contentId);
@@ -434,7 +401,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ013");
+      WsHelper.chuckIt(t, "EQ013");
       return false;
     } finally {
       Thread.currentThread().setContextClassLoader(oldLoader);
@@ -453,7 +420,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       Thread.currentThread().setContextClassLoader(ContentDbLoader.class.getClassLoader());
       final BbWsSession session = new BbWsSession(WebserviceContext.getCurrentSession());
       final Content content = session.loadContent(contentId);
-      ensurePermission(session, content.getCourseId(), "course.content.MODIFY");
+      WsHelper.ensurePermission(session, content.getCourseId(), "course.content.MODIFY");
 
       final String html;
       if (ContentUtil.instance().isLegacy(content)) {
@@ -475,7 +442,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ014");
+      WsHelper.chuckIt(t, "EQ014");
       return false;
     } finally {
       Thread.currentThread().setContextClassLoader(oldLoader);
@@ -494,37 +461,20 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       final BbWsSession session = new BbWsSession(WebserviceContext.getCurrentSession());
       // Need to ensure privs for source and target course
       final Content content = session.loadContent(contentId);
-      ensurePermission(session, content.getCourseId(), "course.content.DELETE");
-      ensurePermission(session, session.getCourseId(courseId), "course.content.CREATE");
+      WsHelper.ensurePermission(session, content.getCourseId(), "course.content.DELETE");
+      WsHelper.ensurePermission(session, session.getCourseId(courseId), "course.content.CREATE");
 
       WebServiceUtil.modifyContent(session, content, courseId, folderId, null, null, null);
       return true;
     } catch (WebserviceException ws) {
       throw ws;
     } catch (Exception t) {
-      chuckIt(t, "EQ015");
+      WsHelper.chuckIt(t, "EQ015");
       return false;
     } finally {
       Thread.currentThread().setContextClassLoader(oldLoader);
     }
   }
 
-  private void ensurePermission(BbWsSession session, Id courseId, String permission) {
-    if (!SecurityUtil.userHasEntitlement(session.getUserId(), courseId, new Entitlement(permission))) {
-      chuckIt(new RuntimeException(
-          "User does not have " + permission + " entitlement for course " + courseId.toExternalString()), "EQ100");
-    }
-  }
 
-  private void chuckIt(Throwable t, String code) {
-    WebServiceUtil.error("Error occurred", t);
-    String message = t.getMessage();
-    if (DEV) {
-      StringWriter sw = new StringWriter();
-      PrintWriter w = new PrintWriter(sw);
-      t.printStackTrace(w);
-      message += "<pre>" + sw.toString() + "</pre>";
-    }
-    AxisHelpers.throwWSException(code, message);
-  }
 }
