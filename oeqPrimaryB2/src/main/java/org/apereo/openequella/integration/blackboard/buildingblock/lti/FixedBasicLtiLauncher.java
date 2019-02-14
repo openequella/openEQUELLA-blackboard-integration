@@ -164,8 +164,9 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 
 			request.setAttribute("toolUrl", ourUrl);
 			request.setAttribute("bltiParams", params);
-			request.setAttribute("useSplashScreen", false);
-			request.setAttribute("splashScreenMessage", null);
+		  	request.setAttribute("useSplashScreen", useSplashScreen);
+		  	request.setAttribute("isFromAdmin", false);
+		  	request.setAttribute("splashScreenMessage", splashScreenMessage);
 			request.setAttribute("shouldOpenInFrame", true);
 			BbLogger.instance().logTrace(
 					"FixedBasicLtiLauncher.launch:  Calling parent launch with url=[" + ourUrl + "], params=[(see below)]",
