@@ -46,7 +46,7 @@ import blackboard.platform.ws.anns.AuthenticatedMethod;
  * @author Aaron
  */
 @SuppressWarnings("nls")
-@WebService(name = "EQUELLA", serviceName = "EQUELLA", portName = "WS", targetNamespace = "http://webservice.blackboard.tle.com")
+@WebService(name = "EQUELLA", serviceName = "EQUELLA", portName = "WS", targetNamespace = "http://webservice.blackboard.integration.openequella.apereo.org")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class ZEquellaWebserviceImpl implements EquellaWebservice {
   private static final int CURRENT_EQUELLA_WS_VERSION = 3;

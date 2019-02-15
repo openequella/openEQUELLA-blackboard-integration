@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+
 import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
@@ -19,13 +22,8 @@ import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.config.ConfigurationServiceFactory;
-import blackboard.platform.log.LogService;
-import blackboard.platform.log.LogServiceFactory;
 import blackboard.platform.plugin.PlugInUtil;
 import blackboard.platform.ws.AxisHelpers;
-
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 
 /**
  * @author Aaron

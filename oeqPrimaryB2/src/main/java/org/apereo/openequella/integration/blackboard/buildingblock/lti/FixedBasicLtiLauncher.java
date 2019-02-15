@@ -11,6 +11,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apereo.openequella.integration.blackboard.buildingblock.Configuration;
+import org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent;
+import org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser;
+import org.apereo.openequella.integration.blackboard.common.BbLogger;
+import org.apereo.openequella.integration.blackboard.common.BbUtil;
+import org.apereo.openequella.integration.blackboard.common.PathUtils;
+
 import blackboard.base.FormattedText;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.user.User;
@@ -20,14 +27,6 @@ import blackboard.platform.blti.BasicLTIConstants;
 import blackboard.platform.blti.BasicLTILauncher;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManagerFactory;
-
-import com.google.common.base.Throwables;
-import org.apereo.openequella.integration.blackboard.buildingblock.Configuration;
-import org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent;
-import org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedUser;
-import org.apereo.openequella.integration.blackboard.common.BbLogger;
-import org.apereo.openequella.integration.blackboard.common.BbUtil;
-import org.apereo.openequella.integration.blackboard.common.PathUtils;
 
 /**
  * Blackboard doesn't sign query string params!! This needs to be implemented in
