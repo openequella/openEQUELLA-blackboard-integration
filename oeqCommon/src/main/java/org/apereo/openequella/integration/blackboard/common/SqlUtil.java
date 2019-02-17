@@ -16,17 +16,67 @@ import blackboard.db.DbUtil;
  */
 @SuppressWarnings("nls")
 // @NonNullByDefault
-public class SqlUtil {
+public class SqlUtil
+{
+	public enum DbType
+	{
+		UNKNOWN, SQL_SERVER, ORACLE, POSTGRES
+	}
+
+	private static DbType type = DbType.UNKNOWN;
+
 	private static final String TABLE = "equellacontent";
 
-	public static StringBuilder select(String... columns) {
+	public static DbType getDatabaseType()
+	{
+		if( type == DbType.UNKNOWN )
+		{
+			try
+			{
+				// Postgres test
+				runSql("SELECT current_database()", null);
+				type = DbType.POSTGRES;
+			}
+			catch( Exception e )
+			{
+				try
+				{
+					// Oracle test
+					runSql("SELECT 1 FROM DUAL", null);
+					type = DbType.ORACLE;
+				}
+				catch( Exception e2 )
+				{
+					try
+					{
+						// SQL server test
+						runSql("SELECT owner, table_name FROM all_tables", null);
+						type = DbType.SQL_SERVER;
+					}
+					catch( Exception e3 )
+					{
+						type = DbType.UNKNOWN;
+					}
+				}
+			}
+		}
+		return type;
+	}
+
+	public static StringBuilder select(String... columns)
+	{
 		final StringBuilder sql = new StringBuilder("SELECT ");
-		if (columns.length == 0) {
+		if( columns.length == 0 )
+		{
 			sql.append("*");
-		} else {
+		}
+		else
+		{
 			boolean first = true;
-			for (String col : columns) {
-				if (!first) {
+			for( String col : columns )
+			{
+				if( !first )
+				{
 					sql.append(", ");
 				}
 				sql.append(col);
@@ -36,11 +86,14 @@ public class SqlUtil {
 		return sql.append(" ").append(from());
 	}
 
-	public static StringBuilder update(String... columns) {
+	public static StringBuilder update(String... columns)
+	{
 		final StringBuilder sql = new StringBuilder("UPDATE ").append(table()).append("SET ");
 		boolean first = true;
-		for (String col : columns) {
-			if (!first) {
+		for( String col : columns )
+		{
+			if( !first )
+			{
 				sql.append(", ");
 			}
 			sql.append(col);
@@ -50,11 +103,14 @@ public class SqlUtil {
 		return sql.append(" ");
 	}
 
-	public static StringBuilder insert(String... columns) {
+	public static StringBuilder insert(String... columns)
+	{
 		StringBuilder sql = new StringBuilder("INSERT INTO ").append(table()).append("(");
 		boolean first = true;
-		for (String col : columns) {
-			if (!first) {
+		for( String col : columns )
+		{
+			if( !first )
+			{
 				sql.append(", ");
 			}
 			sql.append(col);
@@ -63,130 +119,171 @@ public class SqlUtil {
 		return sql.append(") ");
 	}
 
-	public static boolean columnExists(String column) {
-		try {
-			boolean oracle = DbUtil.safeGetBbDatabase().isOracle();
-			SqlUtil.runSql("SELECT " + (oracle ? "" : "TOP 1 ") + " " + column + " FROM " + table(oracle)
-					+ (oracle ? " WHERE rownum < 1" : ""), null);
+	public static boolean columnExists(String column)
+	{
+		try
+		{
+			final DbType t = getDatabaseType();
+			SqlUtil.runSql("SELECT " + (t == DbType.SQL_SERVER ? "TOP 1 " : "") + " " + column + " FROM " + table()
+				+ (t == DbType.ORACLE ? " WHERE rownum < 1" : (t == DbType.POSTGRES ? " LIMIT 1" : "")), null);
 			return true;
-		} catch (Exception e) {
+		}
+		catch( Exception e )
+		{
 			// debug("Failed reading column "+ column +" from DB");
 			return false;
 		}
 	}
 
-	public static String delete() {
+	public static String delete()
+	{
 		return "DELETE " + from();
 	}
 
-	public static String from() {
+	public static String from()
+	{
 		return "FROM " + table();
 	}
 
-	public static String table(boolean oracle) {
-		return getSchema(oracle) + TABLE + " ";
+	public static String table()
+	{
+		return schema() + TABLE + " ";
 	}
 
-	public static String table() {
-		return getSchema() + TABLE + " ";
+	public static String schema()
+	{
+		final DbType t = getDatabaseType();
+		return (t != DbType.SQL_SERVER ? "" : "dbo.");
 	}
 
-	public static String getSchema() {
-		return getSchema(DbUtil.safeGetBbDatabase().isOracle());
-	}
-
-	public static String getSchema(boolean oracle) {
-		return (oracle ? "" : "dbo.");
-	}
-
-	public static <T> List<T> runSql(String sql, /* @Nullable */ResultProcessor<T> processor, Object... params) {
+	public static <T> List<T> runSql(String sql, /* @Nullable */ResultProcessor<T> processor, Object... params)
+	{
 		PreparedStatement stmt = null;
 		List<T> result = null;
 
-		BbLogger.instance().logSqlTrace("Getting connection manager");
+		//BbUtil.sqlTrace("Getting connection manager");
 		ConnectionManager connMgr = DbUtil.safeGetBbDatabase().getConnectionManager();
 
 		Connection conn = null;
-		try {
-			BbLogger.instance().logSqlTrace("Getting connection");
+		try
+		{
+			//BbUtil.sqlTrace("Getting connection");
 			conn = connMgr.getConnection();
 
-			BbLogger.instance().logSqlTrace("Creating statement");
+			//BbUtil.sqlTrace("Creating statement");
 			stmt = conn.prepareStatement(sql);
 
-			BbLogger.instance().logSqlTrace("Has " + params.length + " params");
+			//BbUtil.sqlTrace("Has " + params.length + " params");
 			int index = 1;
-			for (Object param : params) {
-				if (param instanceof OptionalParam) {
+			for( Object param : params )
+			{
+				if( param instanceof OptionalParam )
+				{
 					final OptionalParam<?> opt = (OptionalParam<?>) param;
-					if (opt.isUsed()) {
+					if( opt.isUsed() )
+					{
 						setParam(stmt, index++, opt.getValue());
 					}
-				} else {
+				}
+				else
+				{
 					setParam(stmt, index++, param);
 				}
 			}
 
-			BbLogger.instance().logSqlTrace("Executing: " + sql);
-			if (processor != null) {
+			//BbUtil.sqlTrace("Executing: " + sql);
+			if( processor != null )
+			{
 				result = processor.getResults(stmt.executeQuery());
-			} else {
+			}
+			else
+			{
 				stmt.execute();
 				result = (List<T>) Collections.singletonList(stmt.getUpdateCount());
 			}
-			BbLogger.instance().logSqlTrace("Success!!");
+			//BbUtil.sqlTrace("Success!!");
 			return result;
-		} catch (Exception e) {
-			BbLogger.instance().logError("Failed to runSql", e);
-			throw new RuntimeException(e);
-		} finally {
-			BbLogger.instance().logSqlTrace("Closing statement");
+		}
+		catch( Throwable t )
+		{
+			//BbUtil.error("Failed to runSql", t);
+			throw new RuntimeException(t);
+		}
+		finally
+		{
+			//BbUtil.sqlTrace("Closing statement");
 			DbUtil.closeStatement(stmt);
-			BbLogger.instance().logSqlTrace("Releasing connection");
+			//BbUtil.sqlTrace("Releasing connection");
 			ConnectionManager.releaseDefaultConnection(conn);
 		}
 	}
 
-	public static void setParam(PreparedStatement stmt, int index, /* @Nullable */Object param) throws SQLException {
-		if (param instanceof String) {
-			BbLogger.instance().logSqlTrace("Setting param string[" + index + "] = " + param);
+	public static void setParam(PreparedStatement stmt, int index, /* @Nullable */Object param) throws SQLException
+	{
+		if( param instanceof String )
+		{
+			//BbUtil.sqlTrace("Setting param string[" + index + "] = " + param);
 			stmt.setString(index, (String) param);
-		} else if (param instanceof Integer) {
-			BbLogger.instance().logSqlTrace("Setting param int[" + index + "] = " + param);
+		}
+		else if( param instanceof Integer )
+		{
+			//BbUtil.sqlTrace("Setting param int[" + index + "] = " + param);
 			stmt.setInt(index, (Integer) param);
-		} else if (param instanceof Timestamp) {
-			BbLogger.instance().logSqlTrace("Setting param timestamp[" + index + "] = " + param);
+		}
+		else if( param instanceof Timestamp )
+		{
+			//BbUtil.sqlTrace("Setting param timestamp[" + index + "] = " + param);
 			stmt.setTimestamp(index, (Timestamp) param);
-		} else if (param instanceof Boolean) {
+		}
+		else if( param instanceof Boolean )
+		{
 			boolean pval = (Boolean) param;
-			BbLogger.instance().logSqlTrace("Setting param boolean[" + index + "] = " + pval);
-			stmt.setInt(index, pval ? 1 : 0);
-		} else if (param == null) {
-			BbLogger.instance().logSqlTrace("Setting param ?[" + index + "] = null");
+			//BbUtil.sqlTrace("Setting param boolean[" + index + "] = " + pval);
+			final SqlUtil.DbType t = SqlUtil.getDatabaseType();
+			if (t == DbType.POSTGRES)
+			{
+				// TODO: this should work on all types?
+				stmt.setBoolean(index, pval);
+			}
+			else
+			{
+				stmt.setInt(index, pval ? 1 : 0);
+			}
+		}
+		else if( param == null )
+		{
+			//BbUtil.sqlTrace("Setting param ?[" + index + "] = null");
 			stmt.setString(index, null);
-		} else {
+		}
+		else
+		{
 			throw new RuntimeException("Parameter " + index + " is an unhandled type: " + param.getClass().getName());
 		}
 	}
 
-	public interface ResultProcessor<T> {
+	public interface ResultProcessor<T>
+	{
 		List<T> getResults(ResultSet results) throws SQLException;
 	}
 
-	public static class OptionalParam<T> {
+	public static class OptionalParam<T>
+	{
 		private final T value;
 		private final boolean used;
 
-		public OptionalParam(T value, boolean used) {
+		public OptionalParam(T value, boolean used)
+		{
 			this.value = value;
 			this.used = used;
 		}
 
-		public T getValue() {
+		public T getValue()
+		{
 			return value;
 		}
 
-		public boolean isUsed() {
+		public boolean isUsed()
+		{
 			return used;
 		}
 	}

@@ -619,7 +619,12 @@ public abstract class RegistrationUtil
 				+ "COURSEID varchar(32) NOT NULL, "
 				+ "FOLDERID varchar(32) NOT NULL, " 
 				+ "AVAILABLE boolean NOT NULL,"
-				+ "COURSEAVAILABLE boolean NOT NULL"
+				+ "COURSEAVAILABLE boolean NOT NULL, "
+				+ "CONTENTID varchar(32) NULL, "
+				+ "COURSENAME varchar(512) NULL, "
+				+ "BBDESC varchar(512) NULL, "
+				+ "DTACCESSED timestamp without time zone NULL, "
+				+ "ATTNAME varchar(512) NULL"
 				+  ")";
 			//@formatter:on
 			SqlUtil.runSql(sql, null);
@@ -631,6 +636,7 @@ public abstract class RegistrationUtil
 				null);
 			SqlUtil.runSql("CREATE INDEX eqcontent_uuidversion ON equellacontent(INSTURL, UUID, VERSION)", null);
 			SqlUtil.runSql("CREATE INDEX eqcontent_available ON equellacontent(AVAILABLE, COURSEAVAILABLE)", null);
+			SqlUtil.runSql("CREATE INDEX eqcontent_content ON equellacontent(INSTURL, CONTENTID)", null);
 		}
 	}
 
