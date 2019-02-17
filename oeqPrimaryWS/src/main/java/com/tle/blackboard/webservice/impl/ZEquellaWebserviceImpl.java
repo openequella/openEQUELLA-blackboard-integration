@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +12,13 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
+import com.tle.blackboard.webservice.AddItemResult;
+import com.tle.blackboard.webservice.Base;
+import com.tle.blackboard.webservice.Course;
+import com.tle.blackboard.webservice.EquellaWebservice;
+import com.tle.blackboard.webservice.Folder;
+import com.tle.blackboard.webservice.SearchResult;
+
 import org.apereo.openequella.integration.blackboard.common.BbUtil;
 import org.apereo.openequella.integration.blackboard.common.content.ContentUtil;
 import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
@@ -20,12 +27,6 @@ import org.apereo.openequella.integration.blackboard.common.content.ItemUtil;
 import org.apereo.openequella.integration.blackboard.common.content.LegacyItemUtil;
 import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
 import org.apereo.openequella.integration.blackboard.common.propbag.PropBagMin;
-import org.apereo.openequella.integration.blackboard.webservice.AddItemResult;
-import org.apereo.openequella.integration.blackboard.webservice.Base;
-import org.apereo.openequella.integration.blackboard.webservice.Course;
-import org.apereo.openequella.integration.blackboard.webservice.EquellaWebservice;
-import org.apereo.openequella.integration.blackboard.webservice.Folder;
-import org.apereo.openequella.integration.blackboard.webservice.SearchResult;
 
 import blackboard.data.ExtendedData;
 import blackboard.data.content.Content;
@@ -46,7 +47,7 @@ import blackboard.platform.ws.anns.AuthenticatedMethod;
  * @author Aaron
  */
 @SuppressWarnings("nls")
-@WebService(name = "EQUELLA", serviceName = "EQUELLA", portName = "WS", targetNamespace = "http://webservice.blackboard.integration.openequella.apereo.org")
+@WebService(name = "EQUELLA", serviceName = "EQUELLA", portName = "WS", targetNamespace = "http://webservice.blackboard.tle.com")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use = SOAPBinding.Use.LITERAL, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class ZEquellaWebserviceImpl implements EquellaWebservice {
   private static final int CURRENT_EQUELLA_WS_VERSION = 3;
@@ -239,7 +240,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       final Map<String, Course> courseMap = new HashMap<String, Course>();
       final Map<String, Folder> folderMap = new HashMap<String, Folder>();
 
-      final List<org.apereo.openequella.integration.blackboard.webservice.Content> contents = new ArrayList<org.apereo.openequella.integration.blackboard.webservice.Content>();
+      final List<com.tle.blackboard.webservice.Content> contents = new ArrayList<com.tle.blackboard.webservice.Content>();
       for (ItemInfo usage : usages) {
         final ItemKey key = usage.getItemKey();
         // if the course or folder no longer exist then forget it, the
@@ -261,7 +262,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
           continue;
         }
 
-        final org.apereo.openequella.integration.blackboard.webservice.Content content = WebServiceUtil
+        final com.tle.blackboard.webservice.Content content = WebServiceUtil
             .convertUsage(usage, course, folder);
         // WebServiceUtil.debug("Adding content \"" + content +
         // "\" to return values");
@@ -303,7 +304,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
       final Map<String, Course> courseMap = new HashMap<String, Course>();
       final Map<String, Folder> folderMap = new HashMap<String, Folder>();
 
-      final List<org.apereo.openequella.integration.blackboard.webservice.Content> contents = new ArrayList<org.apereo.openequella.integration.blackboard.webservice.Content>();
+      final List<com.tle.blackboard.webservice.Content> contents = new ArrayList<com.tle.blackboard.webservice.Content>();
       int index = 0;
       for (ItemInfo usage : usages) {
         final ItemKey key = usage.getItemKey();
@@ -321,7 +322,7 @@ public class ZEquellaWebserviceImpl implements EquellaWebservice {
         }
 
         if (index >= offset && (count < 0 || index < offset + count)) {
-          final org.apereo.openequella.integration.blackboard.webservice.Content content = WebServiceUtil
+          final com.tle.blackboard.webservice.Content content = WebServiceUtil
               .convertUsage(usage, course, folder);
           // WebServiceUtil.debug("Adding content \"" + content +
           // "\" to return values");

@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.webservice;
+package com.tle.blackboard.webservice;
 
 import blackboard.platform.ws.anns.AuthenticatedMethod;
 

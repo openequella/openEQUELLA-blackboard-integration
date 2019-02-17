@@ -1,14 +1,9 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import blackboard.data.content.Content;
-import blackboard.persist.BbPersistenceManager;
-import blackboard.persist.Id;
-import blackboard.persist.content.ContentDbLoader;
 
 import org.apereo.openequella.integration.blackboard.common.BbContext;
 import org.apereo.openequella.integration.blackboard.common.BbLogger;
@@ -18,6 +13,11 @@ import org.apereo.openequella.integration.blackboard.common.content.ContentUtil.
 import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
 import org.apereo.openequella.integration.blackboard.common.content.ItemKey;
 import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
+
+import blackboard.data.content.Content;
+import blackboard.persist.BbPersistenceManager;
+import blackboard.persist.Id;
+import blackboard.persist.content.ContentDbLoader;
 
 /**
  * @author Aaron

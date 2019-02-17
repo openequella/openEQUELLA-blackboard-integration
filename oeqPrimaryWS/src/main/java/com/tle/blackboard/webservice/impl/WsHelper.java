@@ -1,12 +1,12 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 
-import org.apereo.openequella.integration.blackboard.webservice.Course;
-import org.apereo.openequella.integration.blackboard.webservice.Folder;
+import com.tle.blackboard.webservice.Course;
+import com.tle.blackboard.webservice.Folder;
 
 import blackboard.data.content.Content;
 import blackboard.persist.Id;
