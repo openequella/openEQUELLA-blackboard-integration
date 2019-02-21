@@ -38,8 +38,6 @@ import blackboard.platform.context.ContextManagerFactory;
 @SuppressWarnings("nls")
 // @NonNullByDefault
 public class FixedBasicLtiLauncher extends BasicLTILauncher {
-	// Sigh, BasicLTILauncher._parameters is private in SP11
-	private final Map<String, String> params2;
 	private String ourUrl;
 
 	private FixedBasicLtiLauncher(String fullUrl, String clientId, String clientSecret, /*
@@ -49,15 +47,6 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 		super(fullUrl, clientId, clientSecret, resourceLinkId);
 
 		ourUrl = fullUrl;
-
-		// Ugh, _parameters is protected in SP13 but *private* in SP11
-		try {
-			final Field paramsField = BasicLTILauncher.class.getDeclaredField("_parameters");
-			paramsField.setAccessible(true);
-			params2 = (Map<String, String>) paramsField.get(this);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 
 		// Put the query string values into the parameters (does this double
 		// post?)
@@ -69,9 +58,9 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 			for (String param : params) {
 				final String[] nameVal = param.split("=");
 				if (nameVal.length == 2) {
-					params2.put(decodePercent(nameVal[0]), decodePercent(nameVal[1]));
+					_parameters.put(decodePercent(nameVal[0]), decodePercent(nameVal[1]));
 				} else {
-					params2.put(decodePercent(nameVal[0]), null);
+					_parameters.put(decodePercent(nameVal[0]), null);
 				}
 			}
 		}
@@ -110,7 +99,7 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 			final Id courseId = BbUtil.getCourseId(request.getParameter(COURSE_ID));
 			try {
 				final CourseMembership courseMembership = user.getCourseMembership(courseId);
-				return (FixedBasicLtiLauncher) super.addGradingInformation(content.getContent(), courseMembership);
+				return (FixedBasicLtiLauncher) super.addGradingInformation(request, content.getContent(), courseMembership);
 			} catch (KeyNotFoundException knf) {
 				// No enrollment, don't add anything
 				return this;
@@ -143,8 +132,8 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 	}
 
 	public FixedBasicLtiLauncher addPostData(String key, /* @Nullable */String value) {
-		params2.put(key, value);
-		return this;
+		_parameters.put(key, value);
+	  	return this;
 	}
 
 	public FixedBasicLtiLauncher addReturnUrl(String returnUrl) {
