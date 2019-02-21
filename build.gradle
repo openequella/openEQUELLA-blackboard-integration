@@ -144,12 +144,12 @@ project(':oeqPrimaryWS') {
 
   task buildWS(type: Jar) {
     dependsOn classes
-    //dependsOn zipJavadoc
+    dependsOn zipJavadoc
     group 'oEQ'
     description 'Compiles the source and packages the web service as a JAR'
     baseName = 'oeq-blackboard-primary-ws'
     with jar
-    //from (project(':oeqCommon').sourceSets.main.output) // Include the common classes as well.
+    from (project(':oeqCommon').sourceSets.main.output) // Include the common classes as well.
     from ('src/main/manifests/bb-manifest.xml'){ // set the B2 version and place in the war
       into("META-INF")
     }

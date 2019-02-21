@@ -8,7 +8,7 @@
 	<info>TLE Taglib</info>
 	<tag>
 		<name>context</name>
-		<tagclass>org.apereo.openequella.integration.blackboard.common.ContextTag</tagclass>
+		<tagclass>org.apereo.openequella.integration.blackboard.buildingblock.ContextTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 	</tag>
 </taglib>

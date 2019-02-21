@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.common;
+package org.apereo.openequella.integration.blackboard.buildingblock;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.tagext.Tag;
