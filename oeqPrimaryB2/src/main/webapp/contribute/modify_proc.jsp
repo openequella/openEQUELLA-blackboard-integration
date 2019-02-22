@@ -3,27 +3,23 @@
 <%@page	import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent" %>
 
 <%@ taglib uri="/bbNG" prefix="bbng"%>
-<%@ taglib uri="/tle" prefix="tle"%>
 
 <%-- Handles the 'save' from edit a resource content object (fancy way of saying oEQ link in Bb) --%>
 
-<tle:context>
-	<%
-		WrappedContent content = new WrappedContent(request);
-		content.modify(request);
-		content.persist(request);
-	%>
+<%
+	WrappedContent content = new WrappedContent(request);
+	content.modify(request);
+	content.persist(request);
+%>
 
-	<bbng:learningSystemPage title="Modify openEQUELLA Object Link">
-		<bbng:breadcrumbBar environment="COURSE" isContent="true" />
+<bbng:learningSystemPage title="Modify openEQUELLA Object Link">
+	<bbng:breadcrumbBar environment="COURSE" isContent="true" />
 
-		<bbng:receipt type="SUCCESS" title="Content Updated"
-			recallUrl="<%=content.getReferrer(true)%>">
-			<h1><%=content.getTitle()%></h1>
-			<%=content.getHtml(request, true)%>
-			<br>
-			<br>
-		</bbng:receipt>
-	</bbng:learningSystemPage>
-
-</tle:context>
+	<bbng:receipt type="SUCCESS" title="Content Updated"
+		recallUrl="<%=content.getReferrer(true)%>">
+		<h1><%=content.getTitle()%></h1>
+		<%=content.getHtml(request, true)%>
+		<br>
+		<br>
+	</bbng:receipt>
+</bbng:learningSystemPage>

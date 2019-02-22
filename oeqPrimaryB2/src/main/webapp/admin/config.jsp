@@ -16,7 +16,6 @@
 <%@page import="org.apereo.openequella.integration.blackboard.common.BbUtil"%>
 <%@page import="org.apereo.openequella.integration.blackboard.common.BbLogger"%>
 <%@ taglib uri="/bbNG" prefix="bbng"%>
-<%@ taglib uri="/tle" prefix="tle"%>
 
 <%! 
 WrappedUser user;
@@ -129,7 +128,7 @@ int number = 1;
 
 				<% if(message.length() > 0) { %>
 					<bbng:dataElement label="" >
-						<div style="{color:blue}"><%=message%></div>
+						<div style="color:blue"><%=message%></div>
 					</bbng:dataElement>
 				<% } %>
 

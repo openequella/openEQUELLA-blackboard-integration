@@ -1,6 +1,8 @@
 <?xml version = '1.0' encoding = 'windows-1252'?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0" metadata-complete="true">
 	<display-name>openEQUELLA</display-name>
 	<description>openEQUELLA Integration with Blackboard</description>
 
@@ -66,32 +68,5 @@
 		<mime-type>text/plain</mime-type>
 	</mime-mapping>
 
-	<!-- Taglibs -->
-
-	<taglib>
-		<taglib-uri>/tle</taglib-uri>
-		<taglib-location>/taglibs/tle.tld</taglib-location>
-	</taglib>
-
-	<taglib>
-		<taglib-uri>/bbNG</taglib-uri>
-		<taglib-location>/taglibs/config/bbNG.tld</taglib-location>
-	</taglib>
-
-	<taglib>
-		<taglib-uri>http://struts.apache.org/tags-bean</taglib-uri>
-		<taglib-location>/taglibs/config/struts/struts-bean.tld</taglib-location>
-	</taglib>
-	<taglib>
-		<taglib-uri>http://struts.apache.org/tags-html</taglib-uri>
-		<taglib-location>/taglibs/config/struts/struts-html.tld</taglib-location>
-	</taglib>
-	<taglib>
-		<taglib-uri>http://struts.apache.org/tags-logic</taglib-uri>
-		<taglib-location>/taglibs/config/struts/struts-logic.tld</taglib-location>
-	</taglib>
-	<taglib>
-		<taglib-uri>http://struts.apache.org/tags-nested</taglib-uri>
-		<taglib-location>/taglibs/config/struts/struts-nested.tld</taglib-location>
-	</taglib>
+	<absolute-ordering/>
 </web-app>
