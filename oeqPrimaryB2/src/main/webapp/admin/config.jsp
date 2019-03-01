@@ -84,7 +84,6 @@ catch(Exception e)
 
 configuration.load();
 String equellaurl = configuration.getEquellaUrl();
-String version = configuration.getVersion();
 String clientId = configuration.getOauthClientId();
 String clientSecret = configuration.getOauthClientSecret();
 String secretId = configuration.getSecretId();
@@ -172,11 +171,7 @@ int number = 1;
       <bbng:stepSubmit cancelUrl="../../blackboard/admin/manage_plugins.jsp" />
 		</bbng:dataCollection>
 	</form>
-	
-	<div style="font-size: 8pt; color: #C0C0C0">
-    <%=version%>
-  </div>
-  
+
   <div style="font-size: 8pt; color: #C0C0C0">
     Logging:  <%=loggingDetails%>
   </div>

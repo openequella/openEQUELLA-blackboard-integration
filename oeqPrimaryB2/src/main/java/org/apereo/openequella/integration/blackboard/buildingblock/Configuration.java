@@ -87,8 +87,6 @@ public class Configuration {
     private final Object contentHandlerLock = new Object();
 
     /* @Nullable */
-    private String version;
-    /* @Nullable */
     private String equellaUrl;
     /* @Nullable */
     private String secret;
@@ -128,9 +126,6 @@ public class Configuration {
             final VirtualInstallationManager vim = VirtualInstallationManagerFactory.getInstance();
             final VirtualHost vhost = vim.getVirtualHost("");
             context.getContextManager().setContext(vhost);
-
-            version = loadVersion();
-            BbLogger.instance().logTrace("Version: " + version);
 
             load();
             ensureLtiPlacement();
@@ -481,26 +476,6 @@ public class Configuration {
         return contentHandler;
     }
 
-    public static String loadVersion() throws IOException {
-        InputStream in = null;
-        try {
-            // CBEACH: This file wasn't able to be read. maybe a permissions or location
-            // issue.
-            // final Properties p = new Properties();
-            // in = Configuration.class.getResourceAsStream("/version.properties");
-            // p.load(in);
-            // final String versionB2 = p.getProperty("version.b2");
-            // return versionB2;
-            BbLogger.instance().logTrace("Loading Version.");
-            return "TODO - need to implement version from file system property.";
-        } catch (Exception e) {
-            BbLogger.instance().logError("Couldn't load version", e);
-            throw new RuntimeException(e);
-        } finally {
-            Closeables.close(in, false);
-        }
-    }
-
     public File getConfigDirectory() {
         return configDirectory;
     }
@@ -597,11 +572,6 @@ public class Configuration {
 
     public void setOauthClientSecret(/* @Nullable */String oauthClientSecret) {
         this.oauthClientSecret = oauthClientSecret;
-    }
-
-    /* @Nullable */
-    public String getVersion() {
-        return version;
     }
 
     public void setMockPortalRoles(/* @Nullable */Set<String> mockPortalRoles) {

@@ -96,7 +96,6 @@ public class ContentUtil {
 			content.setCourseId(course.getId());
 			content.setParentId(folderId);
 			content.setIsAvailable(true);
-			content.setLaunchInNewWindow(true);
 			content.setContentHandler(BbUtil.CONTENT_HANDLER);
 			content.setPosition(-1);
 			content.setIsSequential(false);

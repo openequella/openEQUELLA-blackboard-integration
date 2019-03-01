@@ -404,7 +404,7 @@ public class ContentServlet extends HttpServlet {
 				while (nodeIter.hasNext()) {
 					final ObjectNode link = (ObjectNode) nodeIter.next();
 					final String title = nodeValue(link, "name", "");
-					final String itemName = nodeValue(link, "itemName", title);
+					final String itemName = nodeValue(link, "name", title);
 					final String itemDescription = nodeValue(link, "itemDescription", "");
 
 					final String description = nodeValue(link, "description", itemDescription);
