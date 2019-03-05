@@ -68,7 +68,8 @@ allprojects {
       (
         !file.name.startsWith('jetty-') &&
         !file.name.startsWith('geronimo-') &&
-        !file.name.startsWith('spring-')
+        !file.name.startsWith('spring-') &&
+        !file.name.startsWith('serializer-')        
       )
     }
      
@@ -79,6 +80,13 @@ allprojects {
         fileName.replace("-unresolved", "")
       }
       into("WEB-INF")
+    }
+    from ('src/main/properties/version-unresolved.properties'){ // set the B2 version and place in the war
+      filter{ it.replaceAll('@VERSION@', artifactVersion)}
+      rename { String fileName ->
+        fileName.replace("-unresolved", "")
+      }
+      into(".")
     }
     from ('src/main/java/icons.xml') {
       into("WEB-INF/classes")

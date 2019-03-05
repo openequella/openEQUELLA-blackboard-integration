@@ -1,4 +1,7 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
+
+import org.apereo.openequella.integration.blackboard.common.BbContext;
+import org.apereo.openequella.integration.blackboard.common.BbUtil;
 
 import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
@@ -14,9 +17,6 @@ import blackboard.persist.course.CourseDbPersister;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.ws.SessionVO;
-
-import org.apereo.openequella.integration.blackboard.common.BbContext;
-import org.apereo.openequella.integration.blackboard.common.BbUtil;
 
 /**
  * Container for various webservice session info

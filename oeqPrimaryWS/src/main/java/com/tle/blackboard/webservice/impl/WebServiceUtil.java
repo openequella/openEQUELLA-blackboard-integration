@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -14,6 +14,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Strings;
+import com.tle.blackboard.webservice.Course;
+import com.tle.blackboard.webservice.Folder;
+import com.tle.blackboard.webservice.SearchResult;
+
+import org.apereo.openequella.integration.blackboard.common.BbContext;
+import org.apereo.openequella.integration.blackboard.common.BbUtil;
+import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
+import org.apereo.openequella.integration.blackboard.common.content.ItemKey;
+import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
+
 import blackboard.base.FormattedText;
 import blackboard.data.AttributePermission;
 import blackboard.data.ExtendedData;
@@ -27,16 +38,6 @@ import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.platform.ws.AxisHelpers;
 import blackboard.platform.ws.WebserviceLogger;
-
-import com.google.common.base.Strings;
-import org.apereo.openequella.integration.blackboard.common.BbContext;
-import org.apereo.openequella.integration.blackboard.common.BbUtil;
-import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
-import org.apereo.openequella.integration.blackboard.common.content.ItemKey;
-import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
-import org.apereo.openequella.integration.blackboard.webservice.Course;
-import org.apereo.openequella.integration.blackboard.webservice.Folder;
-import org.apereo.openequella.integration.blackboard.webservice.SearchResult;
 
 /**
  * This class was created SOLELY to reduce the size of EquellaWebserviceImpl
@@ -175,10 +176,10 @@ public class WebServiceUtil {
     }
   }
 
-  static org.apereo.openequella.integration.blackboard.webservice.Content convertUsage(ItemInfo usage, Course course,
+  static com.tle.blackboard.webservice.Content convertUsage(ItemInfo usage, Course course,
       Folder folder) {
     final ItemKey key = usage.getItemKey();
-    final org.apereo.openequella.integration.blackboard.webservice.Content content = new org.apereo.openequella.integration.blackboard.webservice.Content();
+    final com.tle.blackboard.webservice.Content content = new com.tle.blackboard.webservice.Content();
     content.setCourseId(course.getId());
     content.setFolderId(folder.getId());
     content.setId(key.getContentId());
@@ -257,21 +258,21 @@ public class WebServiceUtil {
   }
 
   static SearchResult result(int available,
-      Collection<org.apereo.openequella.integration.blackboard.webservice.Content> contents,
-      Map<String, org.apereo.openequella.integration.blackboard.webservice.Course> courseMap,
-      Map<String, org.apereo.openequella.integration.blackboard.webservice.Folder> folderMap) {
+      Collection<com.tle.blackboard.webservice.Content> contents,
+      Map<String, com.tle.blackboard.webservice.Course> courseMap,
+      Map<String, com.tle.blackboard.webservice.Folder> folderMap) {
     final SearchResult result = new SearchResult();
     result.setAvailable(available);
     result.setResults(
-        contents.toArray(new org.apereo.openequella.integration.blackboard.webservice.Content[contents.size()]));
+        contents.toArray(new com.tle.blackboard.webservice.Content[contents.size()]));
 
     final Collection<Course> courseCol = courseMap.values();
     result.setCourses(
-        courseCol.toArray(new org.apereo.openequella.integration.blackboard.webservice.Course[courseCol.size()]));
+        courseCol.toArray(new com.tle.blackboard.webservice.Course[courseCol.size()]));
 
     final Collection<Folder> folderCol = folderMap.values();
     result.setFolders(
-        folderCol.toArray(new org.apereo.openequella.integration.blackboard.webservice.Folder[folderCol.size()]));
+        folderCol.toArray(new com.tle.blackboard.webservice.Folder[folderCol.size()]));
 
     return result;
   }

@@ -2,12 +2,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://www.blackboard.com/bb-manifest-plugin  bb-manifest-plugin.xsd">
 	<plugin>
-		<name value="openEQUELLA Primary Plugin"/>
-		<handle value="oeqPrimary"/>
+		<name value="openEQUELLA Integration"/>
+		<handle value="tle"/>
 		<description value="openEQUELLA integration with Blackboard 9.1"/>
 		<version value="@VERSION@"/>
 		<vendor>
-			<id value="aper"/>
+			<id value="dych"/>
 			<name value="Apereo"/>
 			<url value="http://apereo.org/"/>
 			<description value=""/>
@@ -35,16 +35,16 @@
 				</jsp>
 			</module-type>
 			<module type="tle-dych-module" useraddable="true" isdeletable="true"
-				isdetachable="true" title="EQUELLA">
+				isdetachable="true" title="openEQUELLA">
 				<ExtraInfo />
-				<description>A portal to the EQUELLA Resource Centre</description>
+				<description>A portal to the openEQUELLA Resource Centre</description>
 			</module>
 		</module-defs>
 
 		<!-- Custom content types defined by this extension -->
 		<content-handlers>
 			<content-handler>
-				<name value="EQUELLA Object" />
+				<name value="openEQUELLA Object" />
 				<handle value="resource/tle-resource" />
 				<http-actions>
 					<create value="contribute/create.jsp?action=structured"/>
@@ -67,8 +67,8 @@
 				<links>
 					<link>
 						<type value="course_tool" />
-						<name value="EQUELLA Search" />
-						<url value="Redirect?forward=access%2fsearching.do" />
+						<name value="openEQUELLA Search" />
+						<url value="Redirect?forward=access/searching.do" />
 						<description value="EQUELLA Content Repository" />
 						<icons>
 							<listitem value="/images/tle.gif" />
@@ -76,19 +76,19 @@
 					</link>
 					<link>
 						<type value="course_tool" />
-						<name value="EQUELLA Contribute" />
-						<url value="Redirect?forward=access%2fcontribute.do" />
-						<description value="EQUELLA Content Repository" />
+						<name value="openEQUELLA Contribute" />
+						<url value="Redirect?forward=access/contribute.do" />
+						<description value="openEQUELLA Content Repository" />
 						<icons>
 							<listitem value="/images/tle.gif" />
 						</icons>
 					</link>
 					<link>
 						<type value="course_tool" />
-						<name value="EQUELLA My Resources" />
+						<name value="openEQUELLA My Resources" />
 						<url
-							value="Redirect?forward=access%2fmyresources.do" />
-						<description value="EQUELLA Content Repository" />
+							value="Redirect?forward=access/myresources.do" />
+						<description value="openEQUELLA Content Repository" />
 						<icons>
 							<listitem value="/images/tle.gif" />
 						</icons>
@@ -110,9 +110,11 @@
 			<permission type="socket" name="*" actions="connect" />			
 			<permission type="runtime" name="db.connection.bb_bb60"
 				actions="" />
-			<permission type="java.io.FilePermission"
-				name="&amp;lt;&amp;lt;ALL FILES&amp;gt;&amp;gt;" actions="read, write" />
-			<permission type="basiclti" name="*"
+			<permission type="java.io.FilePermission" name="${java.home}/-" actions="read"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/-" actions="read,write,delete"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/apps/tomcat/temp/-"  actions="read,write,delete" />
+      <permission type="java.io.FilePermission" name="BB_CONTENT/-" actions="read,write,delete"/>
+      <permission type="basiclti" name="*"
 				actions="sendroles,sendname,sendemail" />
 			<!-- Blind SSL -->	
 			<permission type="java.lang.RuntimePermission" name="setFactory" actions="setFactory" />

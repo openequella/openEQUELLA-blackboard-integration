@@ -12,42 +12,42 @@ import com.google.common.base.Throwables;
  */
 // @NonNullByDefault
 public class BbContext {
-  /* @Nullable */
-  private static BbContext instance;
-  private static final Object instanceLock = new Object();
+	/* @Nullable */
+	private static BbContext instance;
+	private static final Object instanceLock = new Object();
 
-  private final ContextManager context;
-  private final BbPersistenceManager bbPm;
+	private final ContextManager context;
+	private final BbPersistenceManager bbPm;
 
-  @SuppressWarnings("null")
-  public static BbContext instance() {
-    if (instance == null) {
-      synchronized (instanceLock) {
-        if (instance == null) {
-          instance = new BbContext();
-        }
-      }
-    }
-    return instance;
-  }
+	@SuppressWarnings("null")
+	public static BbContext instance() {
+		if (instance == null) {
+			synchronized (instanceLock) {
+				if (instance == null) {
+					instance = new BbContext();
+				}
+			}
+		}
+		return instance;
+	}
 
-  @SuppressWarnings("nls")
-  private BbContext() {
-    try {
-      context = ContextManagerFactory.getInstance();
-      final VirtualInstallation vi = context.getContext().getVirtualInstallation();
-      bbPm = BbPersistenceManager.getInstance(vi);
-    } catch (Exception e) {
-      BbUtil.error("Couldn't init BbContext", e);
-      throw Throwables.propagate(e);
-    }
-  }
+	@SuppressWarnings("nls")
+	private BbContext() {
+		try {
+			context = ContextManagerFactory.getInstance();
+			final VirtualInstallation vi = context.getContext().getVirtualInstallation();
+			bbPm = BbPersistenceManager.getInstance(vi);
+		} catch (Exception e) {
+			BbLogger.instance().logError("Couldn't init BbContext", e);
+			throw Throwables.propagate(e);
+		}
+	}
 
-  public ContextManager getContextManager() {
-    return context;
-  }
+	public ContextManager getContextManager() {
+		return context;
+	}
 
-  public BbPersistenceManager getPersistenceManager() {
-    return bbPm;
-  }
+	public BbPersistenceManager getPersistenceManager() {
+		return bbPm;
+	}
 }

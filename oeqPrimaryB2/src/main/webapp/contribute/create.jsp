@@ -2,24 +2,22 @@
 <%@page contentType="text/html;charset=UTF-8" errorPage="/error.jsp" %>
 <%@page	import="org.apereo.openequella.integration.blackboard.buildingblock.data.WrappedContent"%>
 
-<%@ taglib uri="/tle" prefix="tle"%>
 <%@ taglib uri="/bbNG" prefix="bbng"%>
-<tle:context>
-	<bbng:jspBlock>
-		<%
-			String error="";
-			try
-			{
-				WrappedContent content = new WrappedContent(request);
-				content.startSelectionSession(request, response);
-			}
-			catch (Throwable t)
-			{
-				java.io.StringWriter errors = new java.io.StringWriter();
-				t.printStackTrace(new java.io.PrintWriter(errors));
-				error = errors.toString();
-			}
-		%>
-		<%=error%>
-	</bbng:jspBlock>
-</tle:context>
+
+<bbng:jspBlock>
+	<%
+		String error="";
+		try
+		{
+			WrappedContent content = new WrappedContent(request);
+			content.startSelectionSession(request, response);
+		}
+		catch (Throwable t)
+		{
+			java.io.StringWriter errors = new java.io.StringWriter();
+			t.printStackTrace(new java.io.PrintWriter(errors));
+			error = errors.toString();
+		}
+	%>
+	<%=error%>
+</bbng:jspBlock>

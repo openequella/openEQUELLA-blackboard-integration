@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.webservice.impl;
+package com.tle.blackboard.webservice.impl;
 
 public class PermissionException extends Exception {
   private static final long serialVersionUID = 1L;

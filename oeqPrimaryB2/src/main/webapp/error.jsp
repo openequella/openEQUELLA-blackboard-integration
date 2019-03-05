@@ -4,10 +4,8 @@
 <%@page isErrorPage="true"%>
 
 <%@taglib uri="/bbNG" prefix="bbng"%>
-<%@taglib uri="/tle" prefix="tle"%>
 
-
-<<bbng:genericPage>
+<bbng:genericPage>
 	<bbng:jsBlock>
 		<script type="text/javascript">
 			function swap(name)
@@ -18,23 +16,21 @@
 		</script>
 	</bbng:jsBlock>
 	
-	<tle:context>
-		<bbng:receipt type="FAIL" title="Error">
+	<bbng:receipt type="FAIL" title="Error">
+		<%
+			String strException = exception.getMessage();
+					if( strException != null && !strException.equals("") )
+					{
+						strException = "An error has occurred";
+					}
+		%>
+		<a href="javascript:void(0);" onclick="swap('error')"><%=strException%></a>
+		<div id="error" style="display: none;"><pre><bbng:jspBlock>
 			<%
-				String strException = exception.getMessage();
-						if( strException != null && !strException.equals("") )
-						{
-							strException = "An error has occurred";
-						}
+				PrintWriter pw = new PrintWriter(out);
+							exception.printStackTrace(pw);
 			%>
-			<a href="javascript:void(0);" onclick="swap('error')"><%=strException%></a>
-			<div id="error" style="display: none;"><pre><bbng:jspBlock>
-				<%
-					PrintWriter pw = new PrintWriter(out);
-								exception.printStackTrace(pw);
-				%>
-			</bbng:jspBlock></pre></div>
-		</bbng:receipt>
-	</tle:context>
+		</bbng:jspBlock></pre></div>
+	</bbng:receipt>
 
 </bbng:genericPage>

@@ -1,4 +1,4 @@
-package org.apereo.openequella.integration.blackboard.webservice;
+package com.tle.blackboard.webservice;
 
 public class Folder extends Base {
   // private Course course;
