@@ -62,6 +62,22 @@ public class SynchroniseContentThread extends Thread {
 		}
 	}
 
+	private boolean determineContentAvailability(Content c) {
+	  	// If the content itself is unavailable, return.
+	  	if(!c.getIsAvailable()) {
+	  	  return false;
+		}
+
+		// If the content has a parent (ie folder), see if the folder
+	  	// is available.
+		if(c.getParent() != null) {
+		  return determineContentAvailability(c.getParent());
+		}
+
+		// At this point, the content is available, and has no parent
+	  	return true;
+	}
+
 	@Override
 	public void run() {
 		// scan every course, look at every content and see if it's in the
@@ -92,7 +108,7 @@ public class SynchroniseContentThread extends Thread {
 				BbLogger.instance().logDebug("Found " + equellaContents.size() + " EQUELLA contents");
 				for (Content equellaContent : equellaContents) {
 					final Id folderId = equellaContent.getParentId();
-
+					equellaContent.setIsAvailable(determineContentAvailability(equellaContent));
 					// BbLogger.instance().logDebug("Getting properties for "
 					// + equellaContent.getId().toExternalString() + " "
 					// + equellaContent.getTitle());
