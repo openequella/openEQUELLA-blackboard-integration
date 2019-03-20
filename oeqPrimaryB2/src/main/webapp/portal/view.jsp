@@ -58,9 +58,9 @@ catch (Exception e)
 
 <div id="equella_module">
 	<div class="section" id="search">
-		<div><a href="<%=link("home.do")%>" target="_blank">EQUELLA Home</a></div>
-		<div><a href="<%=link("searching.do")%>" target="_blank">Search EQUELLA</a></div>
-		<div><a href="<%=link("access/contribute.do")%>" target="_blank">Contribute to EQUELLA</a></div>
+		<div><a href="<%=link("home.do")%>" target="_blank">openEQUELLA Home</a></div>
+		<div><a href="<%=link("searching.do")%>" target="_blank">Search openEQUELLA</a></div>
+		<div><a href="<%=link("access/contribute.do")%>" target="_blank">Contribute to openEQUELLA</a></div>
 	</div>
 	<hr>
 	<div class="section" id="tasks">
