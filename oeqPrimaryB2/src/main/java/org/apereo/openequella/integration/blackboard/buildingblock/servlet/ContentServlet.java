@@ -423,7 +423,7 @@ public class ContentServlet extends HttpServlet {
 					}
 					final String mimeType = nodeValue(link, mimeTypeKey, null);
 					ContentUtil.instance().addContent(course.getCourse(), folderId, uuid, version, url, itemName, description,
-							attachmentUuid, attachmentName, mimeType, equellaUrl, configuration.isNewWindow());
+							attachmentUuid, attachmentName, mimeType, equellaUrl, configuration.isNewWindowOrTab());
 				}
 			}
 

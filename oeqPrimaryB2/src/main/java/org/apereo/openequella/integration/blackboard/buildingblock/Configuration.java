@@ -74,7 +74,7 @@ public class Configuration {
     public static final String OAUTH_CLIENT_SECRET = "oauth.clientsecret";
     public static final String RESTRICTIONS = "restrictions";
     public static final String LOG_LEVEL = "loglevel";
-    public static final String NEWWINDOW = "newwindow";
+    public static final String NEW_WINDOW_OR_TAB = "newWindowOrTab";
 
     private static final String DEFAULT_SECRET = "";
     private static final String DEFAULT_RESTRICTION = "none";
@@ -100,7 +100,7 @@ public class Configuration {
     private String restriction;
     /* @Nullable */
     private String logLevel;
-    private boolean newWindow;
+    private boolean newWindowOrTab;
     /* @Nullable */
     private Set<String> mockPortalRoles;
 
@@ -157,11 +157,11 @@ public class Configuration {
         setOauthClientSecret(request.getParameter(OAUTH_CLIENT_SECRET));
         setRestriction(request.getParameter(RESTRICTIONS));
         setLogLevel(request.getParameter(LOG_LEVEL));
-        String newWindowParam = request.getParameter(NEWWINDOW);
+        String newWindowParam = request.getParameter(NEW_WINDOW_OR_TAB);
         if (newWindowParam == null || newWindowParam.equals("")) {
             newWindowParam = "false";
         }
-        setNewWindow(Boolean.parseBoolean(newWindowParam));
+        setNewWindowOrTab(Boolean.parseBoolean(newWindowParam));
         lastModified = Calendar.getInstance().getTime();
 
     }
@@ -200,7 +200,7 @@ public class Configuration {
             setMockPortalRoles(commaSplit(props.getProperty(MOCK_PORTAL_ROLES)));
             setRestriction(props.getProperty(RESTRICTIONS));
             setLogLevel(props.getProperty(LOG_LEVEL));
-            setNewWindow(Boolean.parseBoolean(props.getProperty(NEWWINDOW, "true")));
+            setNewWindowOrTab(Boolean.parseBoolean(props.getProperty(NEW_WINDOW_OR_TAB, "true")));
         } catch (Exception e) {
             BbLogger.instance().logError("Error loading configuration", e);
             throw new RuntimeException(e);
@@ -233,7 +233,7 @@ public class Configuration {
             props.setProperty(MOCK_PORTAL_ROLES, commaJoin(mockPortalRoles));
             props.setProperty(RESTRICTIONS, restriction);
             props.setProperty(LOG_LEVEL, logLevel);
-            props.setProperty(NEWWINDOW, Boolean.toString(newWindow));
+            props.setProperty(NEW_WINDOW_OR_TAB, Boolean.toString(newWindowOrTab));
             props.store(fos, null);
         } catch (Exception e) {
             BbLogger.instance().logError("Error saving configuration", e);
@@ -610,11 +610,11 @@ public class Configuration {
         BbLogger.instance().setLoggingLevel(LogLevel.valueOf(this.logLevel));
     }
 
-    public void setNewWindow(boolean newWindow) {
-        this.newWindow = newWindow;
+    public void setNewWindowOrTab(boolean newWindowOrTab) {
+        this.newWindowOrTab = newWindowOrTab;
     }
 
-    public boolean isNewWindow() {
-        return newWindow;
+    public boolean isNewWindowOrTab() {
+        return newWindowOrTab;
     }
 }

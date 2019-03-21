@@ -57,7 +57,7 @@ public class ItemUtil {
     final String alt = (mimeType == null ? linkTitle : mimeType);
     final String html = MessageFormat.format(ItemUtil.HTML_TEMPLATE, serverUrl, getIcon(fileForIcon), alt,
         PathUtils.urlPath(BbUtil.getBlockRelativePath(), "ViewContent"), linkTitle,
-        (newWindow ? "target=\"_blank\"" : ""));
+        (newWindow ? "target=\"_blank\" rel=\"noopener noreferrer\"" : ""));
     if (!Strings.isNullOrEmpty(itemDescription)) {
       return html + "<div class=\"equella-description\" style=\"margin-top:10px\"><p>" + BbUtil.ent(itemDescription)
           + "</p></div>";
