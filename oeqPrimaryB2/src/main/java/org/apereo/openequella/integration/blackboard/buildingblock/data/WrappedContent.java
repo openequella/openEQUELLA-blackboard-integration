@@ -99,11 +99,11 @@ public class WrappedContent implements Comparable<WrappedContent> {
 		getContent().setIsAvailable(available);
 	}
 
-	public void setNewWindow(boolean newWindow) {
+	public void setNewWindowOrTab(boolean newWindow) {
 		getContent().setLaunchInNewWindow(newWindow);
 	}
 
-	public boolean isNewWindow() {
+	public boolean isNewWindowOrTab() {
 		return getContent().getLaunchInNewWindow();
 	}
 
@@ -268,7 +268,7 @@ public class WrappedContent implements Comparable<WrappedContent> {
 	 */
 	public String getHtml(HttpServletRequest request, boolean bbEvaluateURLs) {
 		String html = ItemUtil.getHtml(Configuration.instance().getEquellaUrl(), getUrl(), getAttachmentName(),
-				getMimeType(), getTitle(), getDescription(), isNewWindow());
+				getMimeType(), getTitle(), getDescription(), isNewWindowOrTab());
 		if (bbEvaluateURLs) {
 			if (request != null && bbEvaluateURLs) {
 				final BbSession bbSession = BbSessionManagerServiceExFactory.getInstance().getSession(request);
@@ -432,7 +432,7 @@ public class WrappedContent implements Comparable<WrappedContent> {
 			final String endDateString = request.getParameter("date_end_datetime");
 			final String displayAfterString = request.getParameter("date_start_checkbox");
 			final String displayUntilString = request.getParameter("date_end_checkbox");
-			final String newWindowString = request.getParameter("newWindow");
+			final String newWindowString = request.getParameter("new_window_or_tab");
 			BbLogger.instance().logTrace("name=" + name);
 			BbLogger.instance().logTrace("description=" + description);
 			BbLogger.instance().logTrace("available=" + available);
@@ -453,7 +453,7 @@ public class WrappedContent implements Comparable<WrappedContent> {
 			setDescribed(described != null && described.equals("true"));
 			setDisplayAfter(displayAfterString != null && displayAfterString.equals("1"));
 			setDisplayUntil(displayUntilString != null && displayUntilString.equals("1"));
-			setNewWindow("true".equals(newWindowString));
+			setNewWindowOrTab("true".equals(newWindowString));
 			if (!Strings.isNullOrEmpty(startDateString)) {
 				final Calendar startDate = Calendar.getInstance();
 				startDate.setTime(DATE_FORMAT.parse(startDateString));

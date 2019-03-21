@@ -50,8 +50,8 @@
 				</bbng:dataElement>
 				
 				<bbng:dataElement label="Open in new window">
-					<bbng:radioElement name="newWindow" value="true"  isSelected="<%= content.isNewWindow()%>">Yes</bbng:radioElement>
-					<bbng:radioElement name="newWindow" value="false" isSelected="<%=!content.isNewWindow()%>">No</bbng:radioElement>
+					<bbng:radioElement name="new_window_or_tab" value="true"  isSelected="<%= content.isNewWindowOrTab()%>">Yes</bbng:radioElement>
+					<bbng:radioElement name="new_window_or_tab" value="false" isSelected="<%=!content.isNewWindowOrTab()%>">No</bbng:radioElement>
 				</bbng:dataElement>
 			
 				<bbng:dataElement label="Do you want to track number of views">

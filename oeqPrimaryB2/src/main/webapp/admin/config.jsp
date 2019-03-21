@@ -90,7 +90,7 @@ String secretId = configuration.getSecretId();
 String secret = configuration.getSecret();
 String restriction = configuration.getRestriction();
 String logLevel = configuration.getLogLevel();
-boolean newWindow = configuration.isNewWindow();
+boolean newWindowOrTab = configuration.isNewWindowOrTab();
 String loggingDetails = BbLogger.instance().getLoggingDetails();
 
 String title = "EQUELLA Server Configuration";
@@ -143,7 +143,7 @@ int number = 1;
 			</bbng:step>
 			
 			<bbng:step title="Options">
-        <bbng:dataElement label="Restrict selection of EQUELLA content">
+        <bbng:dataElement label="Restrict selection of openEQUELLA content">
           <bbng:selectElement name="<%=Configuration.RESTRICTIONS %>" >
             <bbng:selectOptionElement value="none" optionLabel="No restrictions" isSelected="<%=restriction.equals(\"none\") %>"/>
             <bbng:selectOptionElement value="itemonly" optionLabel="Items only" isSelected="<%=restriction.equals(\"itemonly\") %>"/>
@@ -163,8 +163,8 @@ int number = 1;
           </bbng:selectElement>
         </bbng:dataElement>
         
-        <bbng:dataElement label="Default new EQUELLA content to open in a new window">
-          <bbng:checkboxElement name="<%=Configuration.NEWWINDOW%>" value="true" isSelected="<%=newWindow%>" />
+        <bbng:dataElement label="Default new openEQUELLA content to open in a new window or tab">
+          <bbng:checkboxElement name="<%=Configuration.NEW_WINDOW_OR_TAB%>" value="true" isSelected="<%=newWindowOrTab%>" />
         </bbng:dataElement>
       </bbng:step>
       

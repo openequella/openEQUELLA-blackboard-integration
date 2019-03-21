@@ -58,16 +58,16 @@ catch (Exception e)
 
 <div id="equella_module">
 	<div class="section" id="search">
-		<div><a href="<%=link("home.do")%>" target="_blank">openEQUELLA Home</a></div>
-		<div><a href="<%=link("searching.do")%>" target="_blank">Search openEQUELLA</a></div>
-		<div><a href="<%=link("access/contribute.do")%>" target="_blank">Contribute to openEQUELLA</a></div>
+		<div><a href="<%=link("home.do")%>" target="_blank" rel="noopener noreferrer">openEQUELLA Home</a></div>
+		<div><a href="<%=link("searching.do")%>" target="_blank" rel="noopener noreferrer">Search openEQUELLA</a></div>
+		<div><a href="<%=link("access/contribute.do")%>" target="_blank" rel="noopener noreferrer">Contribute to openEQUELLA</a></div>
 	</div>
 	<hr>
 	<div class="section" id="tasks">
 		<n:notEmpty name="tasks">
 			<l:iterate id="task" name="tasks">
 		        <bean:define property="href" id="href" name="task" type="String"/>
-		        <div><a href="<%=href%>" target="_blank"><bean:write name="task" property="text"/></a></div>
+		        <div><a href="<%=href%>" target="_blank" rel="noopener noreferrer"><bean:write name="task" property="text"/></a></div>
 			</l:iterate>
 		</n:notEmpty>		
 		<n:empty name="tasks" >
