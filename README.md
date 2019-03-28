@@ -8,7 +8,7 @@ Version 1.X.Y will support Blackboard v3200 - v3300
 Version 2.W.V will support Blackboard v3400+
 
 ## Building the primary building block
-```
+```bash
 ~$ ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
 ```
 The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/
