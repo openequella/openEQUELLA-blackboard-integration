@@ -222,7 +222,7 @@ public class ContentUtil {
 	private void register(Content content, Course course, ItemInfo itemInfo, String equellaUrl, boolean isNew) {
 		try {
 			// Register in EQUELLA table
-			BbLogger.instance().logTrace("Registering EQUELLA content in database");
+			BbLogger.instance().logTrace("Registering openEQUELLA content in database");
 
 			final ItemKey itemKey = itemInfo.getItemKey();
 

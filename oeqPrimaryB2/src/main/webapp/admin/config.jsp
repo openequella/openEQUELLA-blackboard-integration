@@ -93,7 +93,7 @@ String logLevel = configuration.getLogLevel();
 boolean newWindowOrTab = configuration.isNewWindowOrTab();
 String loggingDetails = BbLogger.instance().getLoggingDetails();
 
-String title = "EQUELLA Server Configuration";
+String title = "openEQUELLA Server Configuration";
 int number = 1;
 %>
 <bbng:genericPage title="openEQUELLA Configuration">
@@ -106,8 +106,8 @@ int number = 1;
 
 	<form action="config.jsp" method="POST">
 		<bbng:dataCollection>
-			<bbng:step title="EQUELLA Server Details">
-				<bbng:dataElement label="EQUELLA URL" isRequired="true">
+			<bbng:step title="openEQUELLA Server Details">
+				<bbng:dataElement label="openEQUELLA URL" isRequired="true">
 					<bbng:textElement isRequired="true" size="100" name="<%=Configuration.EQUELLA_URL%>" value="<%=equellaurl%>"/>
 				</bbng:dataElement>
 				

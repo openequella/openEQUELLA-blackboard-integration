@@ -7,8 +7,11 @@
 
 <%
 	WrappedContent content = new WrappedContent(request);
+	final String modifyReceiptPage = "modify_proc.jsp?" +
+                                      BbUtil.COURSE_ID + "=" + content.getCourse().getId().toExternalString() + "&" +
+                                      BbUtil.CONTENT_ID + "=" + content.getId().toExternalString();
 %>
-<bbng:learningSystemPage title="Modify EQUELLA Content">
+<bbng:learningSystemPage title="Modify openEQUELLA Content">
 	<bbng:breadcrumbBar environment="COURSE" isContent="true" >
 		<bbng:breadcrumb title="Modify Resource Content Object" />
 	</bbng:breadcrumbBar> 
@@ -16,10 +19,7 @@
 		<bbng:pageTitleBar title="Modify Resource Content Object" iconUrl="../images/tle.gif" />
 	</bbng:pageHeader>
 
-	<form name="the_form" action="modify_proc.jsp" method="post">
-		<input type="hidden" name="<%=org.apereo.openequella.integration.blackboard.common.BbUtil.CONTENT_ID%>" value="<%=content.getId().toExternalString()%>">
-		<input type="hidden" name="<%=org.apereo.openequella.integration.blackboard.common.BbUtil.COURSE_ID%>" value="<%=content.getCourse().getId().toExternalString()%>">
-		
+	<form name="the_form" action="<%=modifyReceiptPage%>" method="post">
 		<bbng:dataCollection>
 			<bbng:step title="Content Information">
 				<%	String error = (String)request.getAttribute("error");

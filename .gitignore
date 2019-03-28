@@ -11,3 +11,6 @@ build/
 .project
 .classpath
 .vscode/
+.idea/
+**/.editorconfig
+

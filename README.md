@@ -1,4 +1,4 @@
-# EQUELLA Blackboard Integration
+# openEQUELLA Blackboard Integration
 
 Information about the openEQUELLA community and supporting documentation can be found at https://equella.github.io/
 
@@ -9,15 +9,13 @@ Version 2.W.V will support Blackboard v3400+
 
 ## Building the primary building block
 ```
-~$ ./gradlew :oeqPrimaryB2:clean
-~$ ./gradlew :oeqPrimaryB2:buildB2
+~$ ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
 ```
 The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/
 
 ## Building the primary web service
 ```
-~$ ./gradlew :oeqPrimaryWS:clean
-~$ ./gradlew :oeqPrimaryWS:buildWs
+~$ ./gradlew :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS
 ```
 The jar is placed in (cloned repo)/oeqPrimaryWS/build/libs/
 
