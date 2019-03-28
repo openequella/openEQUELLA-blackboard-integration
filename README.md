@@ -14,7 +14,7 @@ Version 2.W.V will support Blackboard v3400+
 The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/
 
 ## Building the primary web service
-```
+```bash
 ~$ ./gradlew :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS
 ```
 The jar is placed in (cloned repo)/oeqPrimaryWS/build/libs/
