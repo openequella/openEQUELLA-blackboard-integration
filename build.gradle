@@ -1,4 +1,6 @@
 buildscript {
+  println("Building with Bb API [${bbLearnVersion}] ");
+  
   repositories {
     jcenter()
   }
@@ -13,8 +15,6 @@ plugins {
   id 'nebula.lint' version '9.3.2'
 }
 
-
-
 allprojects {
   apply plugin: "java"
   apply plugin: "war"
@@ -27,7 +27,7 @@ allprojects {
       url "https://maven.blackboard.com/content/repositories/releases/"
     }
   }
-    
+
   group = 'org.apereo.openequella.integration.blackboard'
   version = artifactVersion
   

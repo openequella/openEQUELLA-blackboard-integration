@@ -7,6 +7,8 @@ Versions are repo-wide (ie all building blocks / web services will have the same
 Version 1.X.Y will support Blackboard v3200 - v3300
 Version 2.W.V will support Blackboard v3400+
 
+You can override the default Bb API version by adding `-PbbLearnVersion=XYZ` to the `./gradlew` invocation.
+
 ## Building the primary building block
 ```bash
 ~$ ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
