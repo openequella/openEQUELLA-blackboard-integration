@@ -2,7 +2,7 @@
 <manifest>
   <webservice>
     <name value="EQUELLA.WS"/>
-    <description value="EQUELLA web service for use with LMS connectors in openEQUELLA" />
+    <description value="openEQUELLA web service for use with LMS connectors in openEQUELLA" />
     <permissions>
       <permission type="attribute" name="org.aperep.openequella.*" actions="get,set"/>
       <permission type="java.io.FilePermission" name="${java.home}/-" actions="read"/>

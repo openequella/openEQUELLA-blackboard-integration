@@ -130,7 +130,7 @@ public class LegacyItemUtil {
 
 	public static String extractXmlFromBody(String body) {
 		if (body.length() == 0 || !body.startsWith("<!--")) {
-			BbLogger.instance().logError("** Invalid body of EQUELLA BB Content **");
+			BbLogger.instance().logError("** Invalid body of openEQUELLA BB Content **");
 			BbLogger.instance().logError(body);
 			throw new RuntimeException("Broken body on legacy item");
 		}

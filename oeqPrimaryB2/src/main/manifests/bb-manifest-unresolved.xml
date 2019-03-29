@@ -27,7 +27,7 @@
 		</http-actions>
 
 		<module-defs>
-			<module-type ext-ref="tle-dych-module" title="EQUELLA"
+			<module-type ext-ref="tle-dych-module" title="openEQUELLA"
 				uicreatable="true">
 				<jsp-dir>portal</jsp-dir>
 				<jsp>
@@ -61,15 +61,15 @@
 
 		<application-defs>
 			<application handle="course-tool-link" type="course"
-				use-ssl="false" name="EQUELLA" can-allow-guest="true" small-icon=""
+				use-ssl="false" name="openEQUELLA" can-allow-guest="true" small-icon=""
 				large-icon="">
-				<description>Equella Building Block</description>
+				<description>openEQUELLA Building Block</description>
 				<links>
 					<link>
 						<type value="course_tool" />
 						<name value="openEQUELLA Search" />
 						<url value="Redirect?forward=access/searching.do" />
-						<description value="EQUELLA Content Repository" />
+						<description value="openEQUELLA Content Repository" />
 						<icons>
 							<listitem value="/images/tle.gif" />
 						</icons>

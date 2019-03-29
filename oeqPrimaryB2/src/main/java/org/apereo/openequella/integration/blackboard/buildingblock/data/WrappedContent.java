@@ -341,7 +341,7 @@ public class WrappedContent implements Comparable<WrappedContent> {
 
 	public String getReferrer(boolean modify) throws Exception {
 		if (modify) {
-			return PlugInUtil.getEditableContentReturnURL(content.getId(), course.getCourse().getId());
+		  	return PlugInUtil.getEditableContentReturnURL(content.getId(), course.getCourse().getId());
 		} else {
 			return PlugInUtil.getDisplayContentReturnURL(content.getId(), course.getCourse().getId());
 		}
@@ -352,20 +352,24 @@ public class WrappedContent implements Comparable<WrappedContent> {
 	}
 
 	public void load(HttpServletRequest request) throws Exception {
-		if (content == null) {
-			content = getLoader().loadById(BbUtil.getContentId(request.getParameter("content_id")));
-		}
+		loadOnly(request);
 
 		final Calendar endDate = getEndDate();
 		displayUntil = endDate != null;
 		if (!displayUntil) {
-			setEndDate(Calendar.getInstance());
+		 	setEndDate(Calendar.getInstance());
 		}
 
 		final Calendar startDate = getStartDate();
 		displayAfter = startDate != null;
 		if (!displayAfter) {
 			setStartDate(Calendar.getInstance());
+		}
+	}
+
+	public void loadOnly(HttpServletRequest request) throws Exception {
+		if (content == null) {
+		 	content = getLoader().loadById(BbUtil.getContentId(request.getParameter("content_id")));
 		}
 	}
 

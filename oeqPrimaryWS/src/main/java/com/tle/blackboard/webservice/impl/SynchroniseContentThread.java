@@ -40,7 +40,7 @@ public class SynchroniseContentThread extends Thread {
 				recurseChildren(contentDbLoader, courseContent, equellaContents);
 			}
 		} else {
-			BbLogger.instance().logDebug("Content \"" + content.getTitle() + "\" is content.  Checking EQUELLA-ness.");
+			BbLogger.instance().logDebug("Content \"" + content.getTitle() + "\" is content.  Checking openEQUELLA-ness.");
 
 			// check for EQUELLA-ness
 			String handler = content.getContentHandler();
@@ -105,7 +105,7 @@ public class SynchroniseContentThread extends Thread {
 				}
 
 				final Set<ItemKey> itemContent = new HashSet<ItemKey>();
-				BbLogger.instance().logDebug("Found " + equellaContents.size() + " EQUELLA contents");
+				BbLogger.instance().logDebug("Found " + equellaContents.size() + " openEQUELLA contents");
 				for (Content equellaContent : equellaContents) {
 					final Id folderId = equellaContent.getParentId();
 					equellaContent.setIsAvailable(determineContentAvailability(equellaContent));
