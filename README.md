@@ -13,7 +13,7 @@ You can override the default Bb API version by adding `-PbbLearnVersion=XYZ` to 
 ```bash
 ~$ ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
 ```
-The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/
+The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/ .
 
 ## Building the primary web service
 ```bash
@@ -26,7 +26,7 @@ For now, this is just a skeleton building block for testing.
 
 Eventually it may be a helper building block to audit the Blackboard / openEQUELLA integration.
 
-```
+```bash
 ~$ ./gradlew :oeqAuditB2:clean
 ~$ ./gradlew :oeqAuditB2:buildB2
 ```
@@ -39,7 +39,7 @@ TODO
 TODO
 
 ## Check (and fix) dependency issues
-```
+```bash
 ~$ ./gradlew generateGradleLintReport
 ~$ ./gradlew fixGradleLint
 ```
