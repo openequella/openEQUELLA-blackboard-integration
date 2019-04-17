@@ -13,7 +13,7 @@ You can override the default Bb API version by adding `-PbbLearnVersion=XYZ` to 
 ```bash
 ~$ ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
 ```
-The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/
+The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/ .
 
 ## Building the primary web service
 ```bash
