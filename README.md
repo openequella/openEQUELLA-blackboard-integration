@@ -26,7 +26,7 @@ For now, this is just a skeleton building block for testing.
 
 Eventually it may be a helper building block to audit the Blackboard / openEQUELLA integration.
 
-```
+```bash
 ~$ ./gradlew :oeqAuditB2:clean
 ~$ ./gradlew :oeqAuditB2:buildB2
 ```
@@ -39,7 +39,7 @@ TODO
 TODO
 
 ## Check (and fix) dependency issues
-```
+```bash
 ~$ ./gradlew generateGradleLintReport
 ~$ ./gradlew fixGradleLint
 ```
