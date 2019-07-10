@@ -116,19 +116,21 @@ public class FixedBasicLtiLauncher extends BasicLTILauncher {
 	@Override
 	public BasicLTILauncher addCurrentUserInformation(boolean includeRoles, boolean includeName, boolean includeEmail,
 			IdTypeToSend idTypeToSend) {
-		// add username
+		super.addCurrentUserInformation(includeRoles, includeName, includeEmail, idTypeToSend);
+
+		// Force an overwrite of the lis_person_sourcedid
 		Context ctx = ContextManagerFactory.getInstance().getContext();
 		User user = ctx.getUser();
-		addPostData("lis_person_sourcedid", user.getUserName());
-
-		return super.addCurrentUserInformation(includeRoles, includeName, includeEmail, idTypeToSend);
+		return addPostData("lis_person_sourcedid", user.getUserName());
 	}
 
 	@Override
 	public BasicLTILauncher addUserInformation(User user, CourseMembership membership, boolean includeRoles,
 			boolean includeName, boolean includeEmail, IdTypeToSend idTypeToSend) {
-		addPostData("lis_person_sourcedid", user.getUserName());
-		return super.addUserInformation(user, membership, includeRoles, includeName, includeEmail, idTypeToSend);
+		super.addUserInformation(user, membership, includeRoles, includeName, includeEmail, idTypeToSend);
+
+		// Force an overwrite of the lis_person_sourcedid
+		return addPostData("lis_person_sourcedid", user.getUserName());
 	}
 
 	public FixedBasicLtiLauncher addPostData(String key, /* @Nullable */String value) {
