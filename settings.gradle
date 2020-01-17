@@ -1,2 +1,2 @@
 rootProject.name = 'oeq-blackboard-integration'
-include 'oeqAuditB2', 'oeqPrimaryB2', 'oeqCommon', 'oeqPrimaryWS'
+include 'oeqAuditB2', 'oeqPrimaryB2', 'oeqLinkMigrationLTI','oeqCommon', 'oeqPrimaryWS'

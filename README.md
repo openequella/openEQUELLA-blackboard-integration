@@ -21,6 +21,13 @@ The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/ .
 ```
 The jar is placed in (cloned repo)/oeqPrimaryWS/build/libs/
 
+
+## Building the LTI link mirgation tool
+```bash
+~$ ./gradlew :oeqLinkMigrationLTI:clean :oeqLinkMigrationLTI:buildLinkMigration
+```
+The jar is placed in (cloned repo)/oeqLinkMirgationLTI/build/libs/
+
 ## Building the audit building block
 For now, this is just a skeleton building block for testing.
 
@@ -49,4 +56,4 @@ TODO
 Logs to bb-services.txt.  The Building Block Settings page will list the log file as well.
 
 ### SaaS
-Logs to Kibana.  Search for `oeqInteg`.  The default graph won't provide the rows, so hover over the bottom rectangle on the left-hand side of the Kibana Learn interface (should be green) to Add Panel.  Select Table and 'selected' queries.  
+Logs to Kibana.  Search for `oeqInteg`.  The default graph won't provide the rows, so hover over the bottom rectangle on the left-hand side of the Kibana Learn interface (should be green) to Add Panel.  Select Table and 'selected' queries.

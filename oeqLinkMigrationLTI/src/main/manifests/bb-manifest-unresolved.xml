@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <plugin>
+    <name value="Link Migration LTI OpenEquella" />
+    <handle value="opeLinkMigrationLTI" />
+    <description value="Open Equella Link migration tool to LTI." />
+    <version value="1.0" />
+    <requires>
+      <bbversion value="9.1" />
+    </requires>
+    <vendor>
+      <id value="aper"/>
+      <name value="Apereo"/>
+      <url value="http://apereo.org/"/>
+      <description value=""/>
+    </vendor>
+
+    <http-actions>
+      <config value="admin/config.jsp"/>
+    </http-actions>
+
+    <requires>
+      <bbversion value="9.1.0" />
+    </requires>
+
+    <permissions>
+      <permission type="persist" name="Content" actions="create,modify,delete" />
+      <permission type="persist" name="GradableItem" actions="create,modify,delete" />
+      <permission type="persist" name="BasicLTIPlacement" actions="create,modify,delete" />
+      <permission type="persist" name="ContentHandler" actions="create,modify" />
+      <permission type="persist" name="ScoreProvider" actions="create,modify" />
+      <permission type="attribute" name="user.authinfo" actions="get" />
+      <permission type="attribute" name="user.personalinfo"
+                  actions="get" />
+      <permission type="socket" name="*" actions="connect" />
+      <permission type="runtime" name="db.connection.bb_bb60"
+                  actions="" />
+      <permission type="java.io.FilePermission" name="${java.home}/-" actions="read"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/-" actions="read,write,delete"/>
+      <permission type="java.io.FilePermission" name="BB_HOME/apps/tomcat/temp/-"  actions="read,write,delete" />
+      <permission type="java.io.FilePermission" name="BB_CONTENT/-" actions="read,write,delete"/>
+      <permission type="basiclti" name="*"
+                  actions="sendroles,sendname,sendemail" />
+      <!-- Blind SSL -->
+      <permission type="java.lang.RuntimePermission" name="setFactory" actions="setFactory" />
+      <permission type="javax.net.ssl.SSLPermission" name="setHostnameVerifier"
+                  actions="setHostnameVerifier" />
+      <!-- CXF -->
+      <permission type="java.lang.RuntimePermission" name="getClassLoader" />
+      <permission type="java.lang.RuntimePermission" name="setContextClassLoader" />
+      <permission type="java.lang.reflect.ReflectPermission" name="suppressAccessChecks" />
+    </permissions>
+
+
+  </plugin>
+</manifest>

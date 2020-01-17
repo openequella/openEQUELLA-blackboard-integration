@@ -1,10 +1,10 @@
 buildscript {
   println("Building with Bb API [${bbLearnVersion}] ");
-  
+
   repositories {
     jcenter()
   }
-    
+
   dependencies {
     // Needed for pre-compiling the JSPs
     classpath "com.bmuschko:gradle-tomcat-plugin:${gradleTomcatPluginVersion}"
@@ -20,7 +20,7 @@ allprojects {
   apply plugin: "war"
   apply plugin: "com.bmuschko.tomcat"
   apply plugin: 'nebula.lint'
-  
+
   repositories {
     mavenCentral()
     maven {
@@ -30,9 +30,9 @@ allprojects {
 
   group = 'org.apereo.openequella.integration.blackboard'
   version = artifactVersion
-  
+
   gradleLint.rules = ['all-dependency', 'dependency-parentheses', 'duplicate-dependency-class']
-  
+
   dependencies {
     providedCompile( "blackboard.platform:bb-platform:${bbLearnVersion}" ) { transitive = false }
     providedCompile( "blackboard.platform:bb-cms-admin:${bbLearnVersion}" ) { transitive = false }
@@ -44,20 +44,20 @@ allprojects {
     compile group: 'org.apache.cxf', name: 'cxf-bundle', version: '2.7.18'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
     compile group: 'org.apache.struts', name: 'struts-taglib', version: '1.3.10'
-  
+
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:23.0'
 
     // Use JUnit test framework
-    testImplementation 'junit:junit:${junitVersion}'
-  
+    testImplementation "junit:junit:${junitVersion}"
+
     // Needed to precompile the JSPs.
-    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",  
-      "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",  
+    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+      "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
       "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}",
-      "blackboard.platform:bb-taglibs:${bbLearnVersion}",  
-      "blackboard.platform:bb-platform:${bbLearnVersion}",  
-      "javax.servlet:jstl:${jstlVersion}"  
+      "blackboard.platform:bb-taglibs:${bbLearnVersion}",
+      "blackboard.platform:bb-platform:${bbLearnVersion}",
+      "javax.servlet:jstl:${jstlVersion}"
   }
 
   task buildWar (type: War, dependsOn: tomcatJasper) {
@@ -69,10 +69,10 @@ allprojects {
         !file.name.startsWith('jetty-') &&
         !file.name.startsWith('geronimo-') &&
         !file.name.startsWith('spring-') &&
-        !file.name.startsWith('serializer-')        
+        !file.name.startsWith('serializer-')
       )
     }
-     
+
     from 'build/jsps/org/apache/jsp' // include the pre-compiled JSPs
     from ('src/main/manifests/bb-manifest-unresolved.xml'){ // set the B2 version and place in the war
       filter{ it.replaceAll('@VERSION@', artifactVersion)}
@@ -92,27 +92,27 @@ allprojects {
       into("WEB-INF/classes")
     }
   }
-  
+
   tomcat {
     jasper {
       validateXml = true
       outputDir = file("build/jsps")
     }
-  } 
+  }
 }
 
 project(':oeqAuditB2') {
   dependencies {
     compile project(':oeqCommon')
   }
-  
+
   task buildB2() {
     group 'oEQ'
     description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
     dependsOn buildWar
   }
 }
- 
+
 project(':oeqPrimaryB2') {
   dependencies {
     compile project(':oeqCommon')
@@ -125,15 +125,27 @@ project(':oeqPrimaryB2') {
   }
 }
 
+project(':oeqLinkMigrationLTI') {
+  dependencies {
+    compile project(':oeqCommon')
+  }
+
+  task buildLinkMigration() {
+    group 'oEQ'
+    description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
+    dependsOn buildWar
+  }
+}
+
 project(':oeqPrimaryWS') {
   dependencies {
     compile project(':oeqCommon')
   }
-  
+
   task generateJavadoc(type: Javadoc) {
     source = sourceSets.main.allJava
   }
-  
+
   task zipJavadoc(type: Zip, dependsOn: generateJavadoc) {
     archiveName 'documentation.zip'
     destinationDir buildDir
