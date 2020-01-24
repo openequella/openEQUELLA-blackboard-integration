@@ -61,6 +61,9 @@
   					<ui:dataElement label="Placement ID">
             					<input type="text" size="15" name="<%=Fixer.PLACEMENT%>"/>
             </ui:dataElement>
+            <ui:dataElement label="Course ID (Empty for all the courses)">
+                       <input type="text" size="75" name="<%=Fixer.COURSEID%>"/>
+            </ui:dataElement>
 				</ui:step>
 
 				<%

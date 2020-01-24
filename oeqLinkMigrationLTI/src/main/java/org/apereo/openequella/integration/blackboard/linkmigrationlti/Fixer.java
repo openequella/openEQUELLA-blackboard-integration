@@ -12,8 +12,6 @@ import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.navigation.CourseToc;
-import blackboard.data.blti.BasicLTIContent;
-import blackboard.data.BbAttribute;
 import blackboard.data.ExtendedData;
 import blackboard.persist.Id;
 import blackboard.persist.PersistenceException;
@@ -40,6 +38,7 @@ import org.apereo.openequella.integration.blackboard.common.BbContext;
 @SuppressWarnings("nls")
 public class Fixer extends AbstractFixer {
   public static final String EXECUTE = "execute";
+  public static final String COURSEID = "courseId";
   public static final String PLACEMENT = "placementid";
   public static final String EQUELLA_URL = "equellaurl";
   public static final String CONFIG_FILE = "config.properties";
@@ -61,6 +60,7 @@ public class Fixer extends AbstractFixer {
   protected int fixedItems;
   private int blackboardVersion;
   private String placementId;
+  private String courseId;
 
   protected Fixer() throws Exception {
 	super();
@@ -124,6 +124,7 @@ public class Fixer extends AbstractFixer {
   @Override
   public synchronized void submit(HttpServletRequest request) throws Exception {
 	placementId = request.getParameter(PLACEMENT);
+	courseId = request.getParameter(COURSEID);
 	if (request.getParameter(EXECUTE) != null && StringUtils.isNotEmpty(placementId)) {
 	  if (!started && !completed) {
 		started = true;
@@ -131,7 +132,12 @@ public class Fixer extends AbstractFixer {
 		  @Override
 		  public void run() {
 			try {
-			  BbList courseList = courseDbLoader.loadAllCourses();
+			  BbList courseList = new BbList();;
+			  if (StringUtils.isNotEmpty(courseId) && courseDbLoader.doesCourseIdExist(courseId)) {
+				courseList.add(courseDbLoader.loadByCourseId(courseId));
+			  } else{
+				courseList = courseDbLoader.loadAllCourses();
+			  }
 			  int courseCount = courseList.size();
 			  for (int i = 0; i < courseCount; i++) {
 				percent = (int) (100.0 * i / courseCount);
@@ -150,7 +156,6 @@ public class Fixer extends AbstractFixer {
 				  recurseContent(contentDbLoader, courseToc,
 					getChildren(contentDbLoader, courseToc.getContentId()), placementId, 3);
 				}
-
 			  }
 			  started = false;
 			  completed = true;
