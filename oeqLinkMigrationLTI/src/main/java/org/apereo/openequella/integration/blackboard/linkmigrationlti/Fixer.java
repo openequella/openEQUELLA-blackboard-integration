@@ -9,6 +9,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import blackboard.base.BbList;
+import blackboard.base.FormattedText;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.navigation.CourseToc;
@@ -33,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apereo.openequella.integration.blackboard.common.BbContext;
 
 /**
- * @author aholland
+ * @author aholland, ddeblanco
  */
 @SuppressWarnings("nls")
 public class Fixer extends AbstractFixer {
@@ -150,9 +151,6 @@ public class Fixer extends AbstractFixer {
 				for (int j = 0; j < courseTocs.size(); j++) {
 				  CourseToc courseToc = (CourseToc) courseTocs.get(j);
 
-				  //logMessage(1, "Looking at CourseToc '" + courseToc.getLabel() + "' ("
-				  //	+ courseToc.getId().toExternalString() + ")");
-
 				  recurseContent(contentDbLoader, courseToc,
 					getChildren(contentDbLoader, courseToc.getContentId()), placementId, 3);
 				}
@@ -196,103 +194,11 @@ public class Fixer extends AbstractFixer {
 		  logMessage(1, "Error with getDataType: " + exc.getMessage());
 		}
 
-			  /*if (content.getParentId()!=null){
-				logMessage(level, "getParentId" + content.getParentId().toExternalString());
-			  }else {
-				logMessage(level, "getParentId = NULL");
-			  }
-
-
-			  if (content.getParent()!=null){
-				logMessage(level, "getParent" + content.getParent().getUrl());
-			  }else {
-				logMessage(level, "getParent = NULL");
-			  }
-
-			  if (content.getExtensionAttributes()!=null){
-
-				for (String attribute:content.getExtensionAttributes().keySet()){
-				  Map map2 = content.getExtensionAttributes().get(attribute);
-				  logMessage(level+1, "map2: " + attribute);
-				  for (Object attribute2:map2.keySet()){
-					logMessage(level+2, "attribute2: " + attribute2.toString() + " : " + map2.get(attribute2.toString()).toString());
-				  }
-				}
-			  }else {
-				logMessage(level, "getExtensionAttributes = NULL");
-			  }
-
-			  if (content.getBbAttributes()!=null){
-				List<BbAttribute> listBB = content.getBbAttributes().getBbAttributeList();
-				for (BbAttribute bbAttribute:listBB){
-				  if (bbAttribute.getValue()!=null) {
-					logMessage(level + 1, "getBbAttributes" + bbAttribute.getName() + " : " + bbAttribute.getValue().toString());
-				  }else{
-					logMessage(level + 1, "getBbAttributes" + bbAttribute.getName() + " : null");
-				  }
-				}
-			  }else {
-				logMessage(level, "getBbAttributes = NULL");
-			  }
-			  logMessage(level, "getLaunchInNewWindow" + content.getLaunchInNewWindow());
-
-			  logMessage(level, "getAllowGuests: " + content.getAllowGuests());
-
-			   */
-
 		ExtendedData extendedData2 = content.getExtendedData();
 		if (extendedData2 != null) {
-		  mapToString(extendedData2.getValues(), level, "Extended Data");
+		  mapToString(extendedData2.getValues(), level, "Old Extended Data");
 		}
 	  }
-
-			/*if ((handler.equals("resource/x-bb-blti-link")) && (content.getClass().getCanonicalName().equals("blackboard.data.blti.BasicLTIContent"))){
-				BasicLTIContent basicLTIContent = (BasicLTIContent)content;
-				try {
-
-
-
-
-				  if (basicLTIContent.getParentContent()!=null){
-					logMessage(level, "getParentContent" + basicLTIContent.getParentContent().getTitle());
-				  }else {
-					logMessage(level, "getParentContent = NULL");
-				  }
-
-
-
-				  if (basicLTIContent.getDomainConfig()!=null){
-					logMessage(level, "getDomainConfig" + basicLTIContent.getDomainConfig().getKey());
-				  }else {
-					logMessage(level, "getDomainConfig = NULL");
-				  }
-
-				  if (basicLTIContent.getLinkCredentials()!=null){
-					logMessage(level, "getLinkCredentials:key:  " + basicLTIContent.getLinkCredentials().getKey());
-					logMessage(level, "getLinkCredentials: contentId: " + basicLTIContent.getLinkCredentials().getContentId().toExternalString());
-					logMessage(level, "getLinkCredentials: secret: " + basicLTIContent.getLinkCredentials().getSecret());
-					logMessage(level, "getLinkCredentials: id: " + basicLTIContent.getLinkCredentials().getId().toExternalString());
-				  }else {
-					logMessage(level, "getLinkCredentials = NULL");
-				  }
-
-				  if (basicLTIContent.getVendorInfo()!=null){
-					logMessage(level, "getVendorInfo" + basicLTIContent.getVendorInfo().getUrl());
-				  }else {
-					logMessage(level, "getVendorInfo = NULL");
-				  }
-
-				  logMessage(level, "Alternate Url " + basicLTIContent.getAlternateUrl());
-
-				  Map<String,String> customParameters = basicLTIContent.getCustomParameters();
-				  if (customParameters != null) {
-					mapToString(customParameters,level, "customParameters");
-				  }
-				}catch (Exception exc) {
-				  logMessage(1, "ANOTHER ERROR: " + exc.getMessage());
-				}
-
-			}*/
 
 	  if (tleResource) {
 		logMessage(0, "Updating:  " + contentDisplay(content));
@@ -312,8 +218,6 @@ public class Fixer extends AbstractFixer {
 
   private void mapToString(Map<String, String> map, int level, String label) {
 	try {
-
-	  logMessage(level, "MAP SIZE: " + map.size());
 	  Iterator<String> i = map.keySet().iterator();
 	  while (i.hasNext()) {
 		String attribute = i.next();
@@ -332,19 +236,30 @@ public class Fixer extends AbstractFixer {
 	equellaLookedAt++;
 
 	ExtendedData extendedData = ltiContent.getExtendedData();
+	//Update the URL
 	String newUrl = getEquellaUrl() + extendedData.getValue("url");
 	logMessage(level, "NewUrl: " + newUrl);
 	ltiContent.setUrl(newUrl);
+	//Update the Host
 	String newUrlHost = getDomainName(getEquellaUrl());
 	logMessage(level, "NewUrlHost: " + newUrlHost);
 	ltiContent.getBbAttributes().setString("UrlHost", newUrlHost);
-	Map<String, String> values = new HashMap<>();
+	//Update the Type
 	ltiContent.setContentHandler("resource/x-bb-blti-link");
+	//Update the content (remove the link)
+	String htmlContent = ltiContent.getBody().getFormattedText();
+	String toRemove = StringUtils.substringBetween(htmlContent, "<div class=\"equella-link", "</div>");
+	htmlContent = StringUtils.remove(htmlContent,toRemove);
+	FormattedText newFormattedText = new FormattedText(htmlContent,FormattedText.Type.HTML);
+	ltiContent.setBody(newFormattedText);
+	//Update the extended Date
+	Map<String, String> values = new HashMap<>();
 	values.put("customParameters", "");
 	values.put("cimPlacementId", placementId);
 	logMessage(level, "PlacementId: " + placementId);
 	values.put("itemOrigin", "CIM");
 	extendedData.setValues(values);
+	mapToString(values,level, "New Extended Data");
 	// persist it
 	contentDbPersister.persist(ltiContent);
 	fixedItems++;
@@ -384,7 +299,7 @@ public class Fixer extends AbstractFixer {
 		+ " for more details.";
 	} else if (completed) {
 	  return "Execution of fixer has finished!  Looked at " + lookedAt + " items (" + equellaLookedAt
-		+ " EQUELLA items) and converted to LTI " + fixedItems + " items .  The building block can now be safely removed.";
+		+ " EQUELLA items) and converted to LTI " + fixedItems + " items .  The building block can now be safely removed. To run it again, it needs to be uninstalled and installed again.";
 	} else if (hasStarted()) {
 	  return "Execution of fixer has started.  Approx " + percent + " complete.";
 	} else {
