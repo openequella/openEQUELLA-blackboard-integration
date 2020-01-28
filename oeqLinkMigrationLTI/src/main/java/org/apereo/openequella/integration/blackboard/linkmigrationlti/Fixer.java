@@ -10,17 +10,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import blackboard.base.BbList;
 import blackboard.base.FormattedText;
+import blackboard.data.blti.BasicLTIPlacement;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.navigation.CourseToc;
 import blackboard.data.ExtendedData;
 import blackboard.persist.Id;
+import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
+import blackboard.platform.blti.BasicLTIPlacementManager;
 import blackboard.platform.config.BbConfig;
 import blackboard.platform.context.ContextManager;
 import blackboard.platform.log.LogService;
@@ -40,7 +43,7 @@ import org.apereo.openequella.integration.blackboard.common.BbContext;
 public class Fixer extends AbstractFixer {
   public static final String EXECUTE = "execute";
   public static final String COURSEID = "courseId";
-  public static final String PLACEMENT = "placementid";
+  public static final String PLACEMENT = "placementhandle";
   public static final String EQUELLA_URL = "equellaurl";
   public static final String CONFIG_FILE = "config.properties";
 
@@ -60,7 +63,7 @@ public class Fixer extends AbstractFixer {
   protected int equellaLookedAt;
   protected int fixedItems;
   private int blackboardVersion;
-  private String placementId;
+  private String placementHandle;
   private String courseId;
 
   protected Fixer() throws Exception {
@@ -124,19 +127,37 @@ public class Fixer extends AbstractFixer {
 
   @Override
   public synchronized void submit(HttpServletRequest request) throws Exception {
-	placementId = request.getParameter(PLACEMENT);
+	placementHandle = request.getParameter(PLACEMENT);
 	courseId = request.getParameter(COURSEID);
-	if (request.getParameter(EXECUTE) != null && StringUtils.isNotEmpty(placementId)) {
+	if (request.getParameter(EXECUTE) != null && StringUtils.isNotEmpty(placementHandle)) {
 	  if (!started && !completed) {
 		started = true;
 		Runnable runner = new Runnable() {
 		  @Override
 		  public void run() {
 			try {
-			  BbList courseList = new BbList();;
+			  BasicLTIPlacement placement = null;
+			  try {
+			  placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
+			  } catch (KeyNotFoundException ex) {
+				logMessage(0, "---------------------------------------------------");
+				logMessage(0, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
+				started = false;
+				completed = false;
+				errored = true;
+				throw ex;
+			  }
+			  logMessage(0, "Placement.getName: " + placement.getName());
+			  logMessage(0, "Placement url: " + placement.getUrl());
+			  logMessage(0, "Placement handle: " + placement.getHandle());
+			  logMessage(0, "Placement Id: " + placement.getId().toExternalString());
+
+			  mapToString(placement.getCustomParameters(), 0, "placement parameters");
+			  BbList courseList = new BbList();
+			  ;
 			  if (StringUtils.isNotEmpty(courseId) && courseDbLoader.doesCourseIdExist(courseId)) {
 				courseList.add(courseDbLoader.loadByCourseId(courseId));
-			  } else{
+			  } else {
 				courseList = courseDbLoader.loadAllCourses();
 			  }
 			  int courseCount = courseList.size();
@@ -147,12 +168,13 @@ public class Fixer extends AbstractFixer {
 				logMessage(0, "Looking at Course '" + course.getTitle() + "' ("
 				  + course.getId().toExternalString() + ")");
 
+
 				BbList courseTocs = courseTocDbLoader.loadByCourseId(course.getId());
 				for (int j = 0; j < courseTocs.size(); j++) {
 				  CourseToc courseToc = (CourseToc) courseTocs.get(j);
 
 				  recurseContent(contentDbLoader, courseToc,
-					getChildren(contentDbLoader, courseToc.getContentId()), placementId, 3);
+					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 3);
 				}
 			  }
 			  started = false;
@@ -174,7 +196,7 @@ public class Fixer extends AbstractFixer {
 	}
   }
 
-  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, BbList contentList, String placementId, int level)
+  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, BbList contentList, String placementExternalId, int level)
 	throws Exception {
 	for (int j = 0; j < contentList.size(); j++) {
 
@@ -203,7 +225,7 @@ public class Fixer extends AbstractFixer {
 	  if (tleResource) {
 		logMessage(0, "Updating:  " + contentDisplay(content));
 		try {
-		  fixContent(courseToc, content, level);
+		  fixContent(courseToc, content, level, placementExternalId);
 		  logMessage(0, "Success");
 		} catch (Exception ex) {
 		  logMessage(0, "Updating ERROR: " + ex.getMessage());
@@ -212,7 +234,7 @@ public class Fixer extends AbstractFixer {
 		  }
 		}
 	  }
-	  recurseContent(contentLoader, courseToc, getChildren(contentLoader, content.getId()), placementId, level + 1);
+	  recurseContent(contentLoader, courseToc, getChildren(contentLoader, content.getId()), placementExternalId, level + 1);
 	}
   }
 
@@ -232,7 +254,7 @@ public class Fixer extends AbstractFixer {
 	return contentLoader.loadChildren(bbContentId);
   }
 
-  private void fixContent(CourseToc courseToc, Content ltiContent, int level) throws Exception {
+  private void fixContent(CourseToc courseToc, Content ltiContent, int level, String placementExternalId) throws Exception {
 	equellaLookedAt++;
 
 	ExtendedData extendedData = ltiContent.getExtendedData();
@@ -255,8 +277,8 @@ public class Fixer extends AbstractFixer {
 	//Update the extended Date
 	Map<String, String> values = new HashMap<>();
 	values.put("customParameters", "");
-	values.put("cimPlacementId", placementId);
-	logMessage(level, "PlacementId: " + placementId);
+	values.put("cimPlacementId", placementExternalId);
+	logMessage(level, "PlacementId: " + placementExternalId);
 	values.put("itemOrigin", "CIM");
 	extendedData.setValues(values);
 	mapToString(values,level, "New Extended Data");
@@ -374,11 +396,11 @@ public class Fixer extends AbstractFixer {
 	return host;
   }
 
-  public String getPlacementId() {
-	return placementId;
+  public String getPlacementHandle() {
+	return placementHandle;
   }
 
-  public void setPlacementId(String placementId) {
-	this.placementId = placementId;
+  public void setPlacementHandle(String placementHandle) {
+	this.placementHandle = placementHandle;
   }
 }

@@ -58,8 +58,8 @@
 					<ui:dataElement label="Institution URL">
   						<span><%=fixer.getEquellaUrl()%></span>
   					</ui:dataElement>
-  					<ui:dataElement label="Placement ID">
-            					<input type="text" size="15" name="<%=Fixer.PLACEMENT%>"/>
+  					<ui:dataElement label="Placement Handle">
+            					<input type="text" size="75" name="<%=Fixer.PLACEMENT%>"/>
             </ui:dataElement>
             <ui:dataElement label="Course ID (Empty for all the courses)">
                        <input type="text" size="75" name="<%=Fixer.COURSEID%>"/>
