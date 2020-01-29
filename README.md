@@ -22,11 +22,11 @@ The war is placed in (cloned repo)/oeqPrimaryB2/build/libs/ .
 The jar is placed in (cloned repo)/oeqPrimaryWS/build/libs/
 
 
-## Building the LTI link mirgation tool
+## Building the LTI link migration tool
 ```bash
 ~$ ./gradlew :oeqLinkMigrationLTI:clean :oeqLinkMigrationLTI:buildLinkMigration
 ```
-The jar is placed in (cloned repo)/oeqLinkMirgationLTI/build/libs/
+The jar is placed in (cloned repo)/oeqLinkMigrationLTI/build/libs/
 
 ## Building the audit building block
 For now, this is just a skeleton building block for testing.

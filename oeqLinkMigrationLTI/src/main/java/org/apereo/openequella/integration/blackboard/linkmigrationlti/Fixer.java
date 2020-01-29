@@ -1,3 +1,21 @@
+/*
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * The Apereo Foundation licenses this file to you under the Apache License,
+ * Version 2.0, (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apereo.openequella.integration.blackboard.linkmigrationlti;
 
 import java.io.File;
@@ -5,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,28 +43,29 @@ import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.blti.BasicLTIPlacementManager;
-import blackboard.platform.config.BbConfig;
 import blackboard.platform.context.ContextManager;
 import blackboard.platform.log.LogService;
 import blackboard.platform.plugin.PlugInConfig;
 import blackboard.platform.plugin.PlugInException;
-import blackboard.platform.plugin.PlugInUtil;
 import blackboard.platform.vxi.data.VirtualHost;
-import blackboard.platform.vxi.data.VirtualInstallation;
 import blackboard.platform.vxi.service.VirtualInstallationManager;
 import org.apache.commons.lang.StringUtils;
 import org.apereo.openequella.integration.blackboard.common.BbContext;
+import org.apereo.openequella.integration.blackboard.common.BbLogger;
+import org.apereo.openequella.integration.blackboard.common.content.ContentUtil;
+import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
+import org.apereo.openequella.integration.blackboard.common.content.ItemKey;
+import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
 
-/**
- * @author aholland, ddeblanco
- */
 @SuppressWarnings("nls")
-public class Fixer extends AbstractFixer {
+public class Fixer {
   public static final String EXECUTE = "execute";
   public static final String COURSEID = "courseId";
   public static final String PLACEMENT = "placementhandle";
   public static final String EQUELLA_URL = "equellaurl";
   public static final String CONFIG_FILE = "config.properties";
+  protected static final String EQUELLA_BLOCK_VENDOR = "dych";
+  protected static final String EQUELLA_BLOCK_HANDLE = "tle";
 
   private volatile static Fixer instance;
   protected final ContentDbLoader contentDbLoader;
@@ -54,7 +74,6 @@ public class Fixer extends AbstractFixer {
   protected final LogService bbLogs;
   private final ContextManager context;
   private ContentDbPersister contentDbPersister;
-  private final String bbUriStem;
   protected boolean completed;
   protected boolean started;
   protected boolean errored;
@@ -62,12 +81,13 @@ public class Fixer extends AbstractFixer {
   protected int lookedAt;
   protected int equellaLookedAt;
   protected int fixedItems;
-  private int blackboardVersion;
   private String placementHandle;
   private String courseId;
+  protected final StringBuffer log;
+  protected String equellaUrl = "";
 
   protected Fixer() throws Exception {
-	super();
+	log = new StringBuffer();
 
 	BbServiceManager.initFromSystemProps();
 
@@ -76,9 +96,6 @@ public class Fixer extends AbstractFixer {
 	final VirtualHost vh = vim.getVirtualHost(""); //$NON-NLS-1$
 	context = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	context.setContext(vh);
-
-	bbUriStem = getBbUriStem(vim.getVirtualInstallationById(vh.getVirtualInstallationId()));
-
 	bbLogs = BbContext.instance().getPersistenceManager().getLogService();
 	contentDbLoader = (ContentDbLoader) BbContext.instance().getPersistenceManager().getLoader(ContentDbLoader.TYPE);
 	contentDbPersister = (ContentDbPersister) BbContext.instance().getPersistenceManager().getPersister(ContentDbPersister.TYPE);
@@ -91,26 +108,8 @@ public class Fixer extends AbstractFixer {
 	if (instance != null) {
 	  return instance;
 	}
-
 	instance = new Fixer();
 	return instance;
-  }
-
-  private final String getBbUriStem(VirtualInstallation vi) {
-	String path = ""; //$NON-NLS-1$
-	try {
-	  path = PlugInUtil.getUriStem(EQUELLA_BLOCK_VENDOR, EQUELLA_BLOCK_HANDLE, vi);
-	} catch (final Exception t) {
-	  logMessage(0, "Error getting relative path " + t.getMessage()); //$NON-NLS-1$
-	}
-
-	// see Jira Defect TLE-996 :
-	// http://apps.dytech.com.au/jira/browse/TLE-996
-	// This is only a temporary fix. We can't assume the VI is bb_bb60.
-	if (path.length() == 0) {
-	  path = "/webapps/" + EQUELLA_BLOCK_VENDOR + "-" + EQUELLA_BLOCK_HANDLE + "-bb_bb60/";
-	}
-	return path;
   }
 
   @Override
@@ -125,7 +124,6 @@ public class Fixer extends AbstractFixer {
 	setEquellaUrl("");
   }
 
-  @Override
   public synchronized void submit(HttpServletRequest request) throws Exception {
 	placementHandle = request.getParameter(PLACEMENT);
 	courseId = request.getParameter(COURSEID);
@@ -138,7 +136,7 @@ public class Fixer extends AbstractFixer {
 			try {
 			  BasicLTIPlacement placement = null;
 			  try {
-			  placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
+			  	placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
 			  } catch (KeyNotFoundException ex) {
 				logMessage(0, "---------------------------------------------------");
 				logMessage(0, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
@@ -154,7 +152,6 @@ public class Fixer extends AbstractFixer {
 
 			  mapToString(placement.getCustomParameters(), 0, "placement parameters");
 			  BbList courseList = new BbList();
-			  ;
 			  if (StringUtils.isNotEmpty(courseId) && courseDbLoader.doesCourseIdExist(courseId)) {
 				courseList.add(courseDbLoader.loadByCourseId(courseId));
 			  } else {
@@ -173,7 +170,7 @@ public class Fixer extends AbstractFixer {
 				for (int j = 0; j < courseTocs.size(); j++) {
 				  CourseToc courseToc = (CourseToc) courseTocs.get(j);
 
-				  recurseContent(contentDbLoader, courseToc,
+				  recurseContent(contentDbLoader, courseToc, course,
 					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 3);
 				}
 			  }
@@ -187,7 +184,7 @@ public class Fixer extends AbstractFixer {
 			  logMessage(0, "---------------------------------------------------");
 			  logMessage(0, "An error occurred: " + e.getMessage());
 			  logMessage(0, "See Blackboard service logs for details");
-			  bbLogs.logError("An error occurred trying to fix EQUELLA content links", e);
+			  bbLogs.logError("An error occurred trying to fix openEQUELLA content links", e);
 			}
 		  }
 		};
@@ -196,7 +193,7 @@ public class Fixer extends AbstractFixer {
 	}
   }
 
-  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, BbList contentList, String placementExternalId, int level)
+  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, Course course, BbList contentList, String placementExternalId, int level)
 	throws Exception {
 	for (int j = 0; j < contentList.size(); j++) {
 
@@ -225,7 +222,7 @@ public class Fixer extends AbstractFixer {
 	  if (tleResource) {
 		logMessage(0, "Updating:  " + contentDisplay(content));
 		try {
-		  fixContent(courseToc, content, level, placementExternalId);
+		  fixContent(courseToc, course, content, level, placementExternalId);
 		  logMessage(0, "Success");
 		} catch (Exception ex) {
 		  logMessage(0, "Updating ERROR: " + ex.getMessage());
@@ -234,7 +231,7 @@ public class Fixer extends AbstractFixer {
 		  }
 		}
 	  }
-	  recurseContent(contentLoader, courseToc, getChildren(contentLoader, content.getId()), placementExternalId, level + 1);
+	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1);
 	}
   }
 
@@ -254,16 +251,25 @@ public class Fixer extends AbstractFixer {
 	return contentLoader.loadChildren(bbContentId);
   }
 
-  private void fixContent(CourseToc courseToc, Content ltiContent, int level, String placementExternalId) throws Exception {
+  private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId) throws Exception {
 	equellaLookedAt++;
 
 	ExtendedData extendedData = ltiContent.getExtendedData();
+	String equellaURL = getEquellaUrl();
+	ItemInfo itemInfo = null;
+	ItemKey itemkey = null;
+	try {
+	  itemInfo = ContentUtil.instance().ensureProperties(ltiContent, course, ltiContent.getParentId(), equellaURL);
+	  itemkey = itemInfo.getItemKey();
+	} catch (Exception t) {
+	  // ignore
+	}
 	//Update the URL
-	String newUrl = getEquellaUrl() + extendedData.getValue("url");
+	String newUrl = equellaURL + extendedData.getValue("url");
 	logMessage(level, "NewUrl: " + newUrl);
 	ltiContent.setUrl(newUrl);
 	//Update the Host
-	String newUrlHost = getDomainName(getEquellaUrl());
+	String newUrlHost = getDomainName(equellaURL);
 	logMessage(level, "NewUrlHost: " + newUrlHost);
 	ltiContent.getBbAttributes().setString("UrlHost", newUrlHost);
 	//Update the Type
@@ -284,6 +290,14 @@ public class Fixer extends AbstractFixer {
 	mapToString(values,level, "New Extended Data");
 	// persist it
 	contentDbPersister.persist(ltiContent);
+	if (itemkey !=null) {
+	  logMessage(0, "Content \"" + itemkey + "\" in DB .  Removing from DB.");
+	  if (RegistrationUtil.unrecordItem(itemkey.getDatabaseId(), itemkey.getContentId())) {
+	    logMessage(0, "Content \"" + itemkey + "\" in DB .  Succesfully removed.");
+	  } else {
+		logMessage(0, "Content \"" + itemkey + "\" in DB .  Error removing from DB.");
+	  }
+	}
 	fixedItems++;
 
   }
@@ -292,36 +306,13 @@ public class Fixer extends AbstractFixer {
 	return "'" + content.getTitle() + "' (" + content.getId().toExternalString() + ")";
   }
 
-  /**
-   * This is a rather hacky way to get the version.
-   *
-   * @return
-   */
-  @Override
-  protected int getBlackboardVersion() {
-	if (blackboardVersion == 0) {
-	  String vers = BbServiceManager.getConfigurationService().getBbProperty(BbConfig.LIBRARY_VERSION);
-	  // don't use vers.contains (not in Java 1.4)
-	  if (vers.indexOf('.') > -1) //$NON-NLS-1$
-	  {
-		vers = vers.split("\\.")[0]; //$NON-NLS-1$
-	  }
-	  try {
-		blackboardVersion = Integer.parseInt(vers);
-	  } catch (NumberFormatException nfe) {
-		blackboardVersion = 6;
-	  }
-	}
-	return blackboardVersion;
-  }
-
   public String getStatus() {
 	if (errored) {
-	  return "An error occurred when trying to fix EQUELLA links.  See Blackboard log " + bbLogs.getLogFileName()
+	  return "An error occurred when trying to fix openEQUELLA links.  See Blackboard log " + bbLogs.getLogFileName()
 		+ " for more details.";
 	} else if (completed) {
 	  return "Execution of fixer has finished!  Looked at " + lookedAt + " items (" + equellaLookedAt
-		+ " EQUELLA items) and converted to LTI " + fixedItems + " items .  The building block can now be safely removed. To run it again, it needs to be uninstalled and installed again.";
+		+ " openEQUELLA items) and converted to LTI " + fixedItems + " items .  The building block can now be safely removed. To run it again, it needs to be uninstalled and installed again.";
 	} else if (hasStarted()) {
 	  return "Execution of fixer has started.  Approx " + percent + " complete.";
 	} else {
@@ -329,11 +320,6 @@ public class Fixer extends AbstractFixer {
 	}
   }
 
-  @Override
-  protected void logMessage(int lvl, String msg) {
-	super.logMessage(lvl, msg);
-	bbLogs.logWarning("[EQUELLA Link Fixer] " + msg);
-  }
 
   public synchronized boolean hasStarted() {
 	return started;
@@ -343,12 +329,11 @@ public class Fixer extends AbstractFixer {
 	return completed;
   }
 
-  @Override
   public synchronized String getEquellaUrl() {
 	if (equellaUrl.length() == 0) {
 	  File configFile = new File(getConfigDirectory(), CONFIG_FILE);
 	  if (!configFile.exists()) {
-		throw new RuntimeException("Cannot find EQUELLA Plugin Building Block configuration file");
+		throw new RuntimeException("Cannot find openEQUELLA Plugin Building Block configuration file");
 	  }
 
 	  Properties props = new Properties();
@@ -359,9 +344,8 @@ public class Fixer extends AbstractFixer {
 	  }
 	  if (props.containsKey(EQUELLA_URL)) {
 		equellaUrl = props.getProperty(EQUELLA_URL);
-		EQUELLA_URL_REGEX = null;
 	  } else {
-		throw new RuntimeException("EQUELLA Url in EQUELLA Plugin Building Block is not set");
+		throw new RuntimeException("openEQUELLA Url in openEQUELLA Plugin Building Block is not set");
 	  }
 	}
 	return equellaUrl;
@@ -379,9 +363,29 @@ public class Fixer extends AbstractFixer {
 	}
   }
 
-  @Override
-  protected String getRelativePath() {
-	return bbUriStem;
+  public String getLog()
+  {
+	return log.toString();
+  }
+
+  protected void logMessage(int lvl, String msg)
+  {
+	log.append(loggerPadding(lvl) + msg + "\n");
+	bbLogs.logWarning("[oEQ Link Migrator] " + msg);
+  }
+
+  private String loggerPadding(int level)
+  {
+    String pattern = "yyyy-MM-dd HH:mm:ss.SSS";
+	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+	String date = simpleDateFormat.format(new Date());
+    String pad = "[" + date + "]";
+	for( int lvl = 0; lvl < level; lvl++ )
+	{
+	  pad += "  ";
+	}
+	return pad;
   }
 
   public static String getDomainName(String url) throws MalformedURLException {
