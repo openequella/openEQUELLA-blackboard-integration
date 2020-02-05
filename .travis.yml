@@ -24,4 +24,4 @@ deploy:
   file: oeqPrimaryB2/build/libs/*
   skip_cleanup: true
   on:
-    tags: true
+    branch: chore/29-git-release-via-travis
