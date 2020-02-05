@@ -10,7 +10,7 @@ cache:
 install: true
 
 script:
-  - ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2
+  - ./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2 :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -21,7 +21,9 @@ deploy:
   api_key:
     secure: cpHkGCnmBxLuHnQ1qrGx2EQwVhw8kVHzdaiCrGTDQPcjIB1AWr1ID+UmDeEhZOOF6NYZakL579DvdDAiP7C9NwCT17mej0MZYwfy4yJl1BzZGSD73lq2zQtL0HeVtiaUSpP/GvsepATWSpM+E/hWW1kP+BTZgp/9fvzUYVV96S1tWDAq4EikRm5O5WOXInDni3oMXqxjZaGhs5YOvDD1cvNBpyuygqQI/YqJ9qXnTCIsXaYq0Wmk6rsQSEfagmkTBeu79WZairA6NVvb7iLWl1G/MqT+B01P1Zx1GtAm3arZUm38KIrJiQMzUPdAnKq88aYoQ+EW6l/NyWUkz40g6J2Hhc4V8AtBRUOXXx+TPO6GwPZ1DUu8n5R2/qm5L4OrH/k8n+QSeMZN2jLrMkK1gHQUXo8QF7N08JPD+BoZ0INeKXN2UdE9saVxFMvUDhvI/+BFMKA33/xqw2oWTMvtPvKDvmWJnTlS9veWc92fistNV8vHXDtC71PXVfIq6PYOsx7w1Yo5PEuRIkbJR2vaHFMiyqIEBJp1EM39OVj9+tUvslwQtJ5ZS5UXn3yLsrilVT3L1TuocU/fnU5SXuRGjEPNleLW7t2rT63pOXq37Qi7ZGoxUVFUFi2Iq6nzU2a4FhHSLDGa7bvMd4tgdN+zqVSxXPtaR5za9uSErNtp3v4=
   file_glob: true
-  file: oeqPrimaryB2/build/libs/*
+  file: 
+    - oeqPrimaryB2/build/libs/*
+    - oeqPrimaryWS/build/libs/*
   skip_cleanup: true
   on:
-    branch: chore/29-git-release-via-travis
+    tags: true
