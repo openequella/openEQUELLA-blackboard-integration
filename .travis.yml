@@ -7,7 +7,7 @@ cache:
   - "$HOME/.gradle/wrapper/"
 install: true
 script:
-- "./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2 :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS"
+- "./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2 :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS :oeqLinkMigrationLTI:clean :oeqLinkMigrationLTI:buildLinkMigration"
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -19,6 +19,7 @@ deploy:
   file: 
   - oeqPrimaryB2/build/libs/*
   - oeqPrimaryWS/build/libs/*
+  - oeqLinkMigrationLTI/build/libs/*
   skip_cleanup: true
   on:
     tags: true
