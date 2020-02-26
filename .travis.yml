@@ -1,0 +1,25 @@
+language: java
+jdk:
+- openjdk8
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+install: true
+script:
+- "./gradlew :oeqPrimaryB2:clean :oeqPrimaryB2:buildB2 :oeqPrimaryWS:clean :oeqPrimaryWS:buildWS"
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+deploy:
+  provider: releases
+  api_key:
+    secure: JXTPe3VXHp+ICoKXwRWScrDj5pQY41UvZtTT9Acubt9DWZ1KJ14WSAliQOHgS+GND8eyeUeqv3WoKFba6LuICr/rH1EmeEOOZ68huDxp2Y02MCmUxt9KR2o5SYUi+wZZOf4QIn20ZZfCq2vpkwx9wSHw30Qe2x2tWbt+5AkCxw5Ghk7eEPUBDyqsqUASDUwaL3svAsa1nmrbZETkJqNBokMSMoCkrxA771VtE+i2C8DH4HjUQMtgd2IRw2VcFH9Y5D7ds+LXxerAWFNV6906/N75wU8fLM/Lu3ZRWy73VDhEassCFLj2gZcRv+HE2Y9UaP6I8zrwPPIxpt4PvZW9/GVpGoGqIKnCwu5+mfdcrvFTMYtcjJi9rkDsAAr7Isc9VJAUfsfaFrI4Top/c7exHXxAUCvvC/IQ2OrOdSLO5jn44gxPjBmNuj9FUlO8zX79PcbQA2hPzB1wp558by1PPufC+3fieHmAvA46wxFIWoUg25Jd+5omspbUDTxJc6UwBQFJo4toNmCj8pDhWLxX1pBn/Sh21x4A8KW6J3o4e8CvAX/fOpaKyJhAGSqkb8mcr7xyUoug9pJkCAV2FD1/lO5kA3s8/QQCSFkuxeWd7j14PVeoFacKChZ8POMwKtU9PTov5kAhmxBd5SONwIP22jRHeP4iXdeX2CH0dk+jbco=
+  file_glob: true
+  file: 
+  - oeqPrimaryB2/build/libs/*
+  - oeqPrimaryWS/build/libs/*
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: openequella/openEQUELLA-blackboard-integration
