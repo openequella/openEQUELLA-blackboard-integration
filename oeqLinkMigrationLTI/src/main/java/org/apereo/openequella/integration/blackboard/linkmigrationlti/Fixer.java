@@ -60,6 +60,7 @@ import org.apereo.openequella.integration.blackboard.common.content.Registration
 @SuppressWarnings("nls")
 public class Fixer {
   public static final String EXECUTE = "execute";
+  public static final String RESET = "reset";
   public static final String COURSEID = "courseId";
   public static final String PLACEMENT = "placementhandle";
   public static final String EQUELLA_URL = "equellaurl";
@@ -83,11 +84,11 @@ public class Fixer {
   protected int fixedItems;
   private String placementHandle;
   private String courseId;
-  protected final StringBuffer log;
+  protected StringBuffer log;
   protected String equellaUrl = "";
 
   protected Fixer() throws Exception {
-	log = new StringBuffer();
+	resetState();
 
 	BbServiceManager.initFromSystemProps();
 
@@ -102,6 +103,14 @@ public class Fixer {
 	courseDbLoader = (CourseDbLoader) BbContext.instance().getPersistenceManager().getLoader(CourseDbLoader.TYPE);
 	courseTocDbLoader = (CourseTocDbLoader) BbContext.instance().getPersistenceManager().getLoader(CourseTocDbLoader.TYPE);
 
+  }
+
+  protected synchronized void resetState() {
+    completed = false;
+    started = false;
+    errored = false;
+
+	log = new StringBuffer();
   }
 
   public static Fixer instance() throws Exception {
@@ -125,7 +134,13 @@ public class Fixer {
   }
 
   public synchronized void submit(HttpServletRequest request) throws Exception {
-	placementHandle = request.getParameter(PLACEMENT);
+	if((request.getParameter(RESET) != null) && canReset()) {
+	  resetState();
+	  logMessage(0, "State reset.");
+	  return;
+	}
+
+    placementHandle = request.getParameter(PLACEMENT);
 	courseId = request.getParameter(COURSEID);
 	if (request.getParameter(EXECUTE) != null && StringUtils.isNotEmpty(placementHandle)) {
 	  if (!started && !completed) {
@@ -184,7 +199,7 @@ public class Fixer {
 			  logMessage(0, "---------------------------------------------------");
 			  logMessage(0, "An error occurred: " + e.getMessage());
 			  logMessage(0, "See Blackboard service logs for details");
-			  bbLogs.logError("An error occurred trying to fix openEQUELLA content links", e);
+			  bbLogs.logError("An error occurred trying to migrate openEQUELLA content links", e);
 			}
 		  }
 		};
@@ -308,18 +323,21 @@ public class Fixer {
 
   public String getStatus() {
 	if (errored) {
-	  return "An error occurred when trying to fix openEQUELLA links.  See Blackboard log " + bbLogs.getLogFileName()
+	  return "An error occurred when trying to migrate openEQUELLA links.  See Blackboard log " + bbLogs.getLogFileName()
 		+ " for more details.";
 	} else if (completed) {
-	  return "Execution of fixer has finished!  Looked at " + lookedAt + " items (" + equellaLookedAt
-		+ " openEQUELLA items) and converted to LTI " + fixedItems + " items .  The building block can now be safely removed. To run it again, it needs to be uninstalled and installed again.";
+	  return "Migration has finished!  Looked at " + lookedAt + " items (" + equellaLookedAt
+		+ " openEQUELLA items) and converted to LTI " + fixedItems + " items.";
 	} else if (hasStarted()) {
-	  return "Execution of fixer has started.  Approx " + percent + " complete.";
+	  return "Migration has started.  Approx " + percent + " complete.";
 	} else {
 	  return "Ready to start.  It is <b>HIGHLY</b> recommended that you backup your Blackboard database before pressing the Submit button.";
 	}
   }
 
+  public synchronized boolean canReset() {
+	return errored || completed;
+  }
 
   public synchronized boolean hasStarted() {
 	return started;

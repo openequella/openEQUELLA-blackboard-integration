@@ -43,10 +43,10 @@
 		error = s.toString();
 	}
 
-	String title = "EQUELLA LTI Link Migration Plugin";
+	String title = "openEQUELLA LTI Link Migration Plugin";
 	%>
 
-	<ui:docTemplate title="EQUELLA Configuration">
+	<ui:docTemplate title="openEQUELLA Configuration">
 		<ui:breadcrumbBar handle="admin_plugin_manage">
 			<ui:breadcrumb><%=title%></ui:breadcrumb>
 		</ui:breadcrumbBar>
@@ -54,7 +54,7 @@
 		<ui:titleBar iconUrl="../images/openEquella.gif"><%=title%></ui:titleBar>
 			<form action="config.jsp" method="POST">
 
-				<ui:step title="EQUELLA Plugin settings">
+				<ui:step title="openEQUELLA Plugin settings">
 					<ui:dataElement label="Institution URL">
   						<span><%=fixer.getEquellaUrl()%></span>
   					</ui:dataElement>
@@ -67,15 +67,23 @@
 				</ui:step>
 
 				<%
-				if (!fixer.hasStarted() && !fixer.hasCompleted())
+				if (fixer.canReset())
 				{
 				%>
-					<ui:step title="Confirmation">
-						<ui:dataElement label="Check this box to begin execution when the Submit button is clicked">
-	  						<input type="checkbox" name="<%=Fixer.EXECUTE%>" />
-  						</ui:dataElement>
-					</ui:step>
+					<ui:step title="Reset">
+            <ui:dataElement label="Check this box to reset the migration state when the Submit button is clicked">
+                <input type="checkbox" name="<%=Fixer.RESET%>" />
+              </ui:dataElement>
+          </ui:step>
 				<%
+				} else if (!fixer.hasStarted() && !fixer.hasCompleted()) {
+				%>
+          <ui:step title="Confirmation">
+            <ui:dataElement label="Check this box to begin execution when the Submit button is clicked">
+                <input type="checkbox" name="<%=Fixer.EXECUTE%>" />
+              </ui:dataElement>
+          </ui:step>
+        <%
 				}
 				%>
 
@@ -105,8 +113,7 @@
 						}
 						%>
 				</ui:step>
-
-				<ui:stepSubmit title="Submit" />
+        <ui:stepSubmit title="Submit" />
 			</form>
 
 			<%

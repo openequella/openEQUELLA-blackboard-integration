@@ -23,11 +23,6 @@
   </taglib>
 
   <taglib>
-    <taglib-uri>/tle</taglib-uri>
-    <taglib-location>/WEB-INF/tle.tld</taglib-location>
-  </taglib>
-
-  <taglib>
     <taglib-uri>/bbData</taglib-uri>
     <taglib-location>/WEB-INF/bbData.tld</taglib-location>
   </taglib>

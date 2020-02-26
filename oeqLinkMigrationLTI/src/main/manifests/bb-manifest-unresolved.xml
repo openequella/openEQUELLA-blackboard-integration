@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
   <plugin>
-    <name value="Link Migration LTI OpenEquella" />
-    <handle value="opeLinkMigrationLTI" />
-    <description value="Open Equella Link migration tool to LTI." />
-    <version value="1.0" />
+    <name value="openEQUELLA Link Migration" />
+    <handle value="oeqLinkMigrationLTI" />
+    <description value="openEQUELLA B2 to LTI migration tool" />
+    <version value="@VERSION@"/>
     <requires>
       <bbversion value="9.1" />
     </requires>
