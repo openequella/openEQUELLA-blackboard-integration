@@ -24,15 +24,15 @@
 		}
 		if (fixer.hasCompleted())
 		{
-		message = "Fixer has finished.";
+		message = "Migration has finished.";
 	}
 		else if (fixer.hasStarted())
 		{
-		message = "Fixer has been started.  Press Submit again to refresh the page and view the log output.";
+		message = "Migration has been started.  Press Submit again to refresh the page and view the log output.";
 		}
 		else
 		{
-		message = "Fixer is ready to start.";
+		message = "Migration is ready to start.";
 		}
 	}
 	catch(Exception e)
@@ -61,7 +61,7 @@
   					<ui:dataElement label="Placement Handle">
             					<input type="text" size="75" name="<%=Fixer.PLACEMENT%>"/>
             </ui:dataElement>
-            <ui:dataElement label="Course ID (Empty for all the courses)">
+            <ui:dataElement label="Course External ID (Empty for all the courses)">
                        <input type="text" size="75" name="<%=Fixer.COURSEID%>"/>
             </ui:dataElement>
 				</ui:step>
