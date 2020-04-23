@@ -84,12 +84,10 @@ public class Fixer {
   protected int fixedItems;
   private String placementHandle;
   private String courseId;
-  protected StringBuffer log;
   protected String equellaUrl = "";
+  protected FixerUtils utils;
 
   protected Fixer() throws Exception {
-	resetState();
-
 	BbServiceManager.initFromSystemProps();
 
 	final VirtualInstallationManager vim = (VirtualInstallationManager) BbServiceManager
@@ -103,6 +101,7 @@ public class Fixer {
 	courseDbLoader = (CourseDbLoader) BbContext.instance().getPersistenceManager().getLoader(CourseDbLoader.TYPE);
 	courseTocDbLoader = (CourseTocDbLoader) BbContext.instance().getPersistenceManager().getLoader(CourseTocDbLoader.TYPE);
 
+	resetState();
   }
 
   protected synchronized void resetState() {
@@ -110,7 +109,7 @@ public class Fixer {
     started = false;
     errored = false;
 
-	log = new StringBuffer();
+	utils = new FixerUtils(bbLogs);
   }
 
   public static Fixer instance() throws Exception {
@@ -136,7 +135,7 @@ public class Fixer {
   public synchronized void submit(HttpServletRequest request) throws Exception {
 	if((request.getParameter(RESET) != null) && canReset()) {
 	  resetState();
-	  logMessage(0, "State reset.");
+	  utils.log(0, "State reset.");
 	  return;
 	}
 
@@ -151,37 +150,37 @@ public class Fixer {
 			try {
 			  BasicLTIPlacement placement = null;
 
-			  logMessage(0, "Loading placement...");
+			  utils.log(0, "Loading placement...");
 			  try {
 			  	placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
 			  } catch (KeyNotFoundException ex) {
-				logMessage(1, "---------------------------------------------------");
-				logMessage(1, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
+				utils.log(1, "---------------------------------------------------");
+				utils.log(1, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
 				started = false;
 				completed = false;
 				errored = true;
 				throw ex;
 			  }
-			  logMessage(1, "Name: " + placement.getName());
-			  logMessage(1, "Url: " + placement.getUrl());
-			  logMessage(1, "Handle: " + placement.getHandle());
-			  logMessage(1, "Id: " + placement.getId().toExternalString());
+			  utils.log(1, "Name: " + placement.getName());
+			  utils.log(1, "Url: " + placement.getUrl());
+			  utils.log(1, "Handle: " + placement.getHandle());
+			  utils.log(1, "Id: " + placement.getId().toExternalString());
 
 			  mapToString(placement.getCustomParameters(), 0, "placement parameters");
 			  BbList courseList = new BbList();
 			  if (StringUtils.isNotEmpty(courseId) && courseDbLoader.doesCourseIdExist(courseId)) {
 				courseList.add(courseDbLoader.loadByCourseId(courseId));
-				logMessage(0, "Filtering by course: " + courseId);
+				utils.log(0, "Filtering by course: " + courseId);
 			  } else if (StringUtils.isNotEmpty(courseId)) {
-				logMessage(0, "---------------------------------------------------");
-				logMessage(0, "An error occurred: The course ID does not exist. Please provide a valid course ID or leave empty for ALL courses");
+				utils.log(0, "---------------------------------------------------");
+				utils.log(0, "An error occurred: The course ID does not exist. Please provide a valid course ID or leave empty for ALL courses");
 				started = false;
 				completed = false;
 				errored = true;
 				throw new Exception("Unknown course filter ID of " + courseId);
 			  } else {
 				courseList = courseDbLoader.loadAllCourses();
-				logMessage(0, "No course filter specified - migrating ALL courses");
+				utils.log(0, "No course filter specified - migrating ALL courses");
 			  }
 
 			  int courseCount = courseList.size();
@@ -189,7 +188,7 @@ public class Fixer {
 				percent = (int) (100.0 * i / courseCount);
 				Course course = (Course) courseList.get(i);
 
-				logMessage(0, "Beginning review of course '" + course.getTitle() + "' ("
+				utils.log(0, "Beginning review of course '" + course.getTitle() + "' ("
 				  + course.getId().toExternalString() + ")");
 
 
@@ -201,7 +200,7 @@ public class Fixer {
 					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 0);
 				}
 
-				logMessage(0, "Finished review of course '" + course.getTitle() + "' ("
+				utils.log(0, "Finished review of course '" + course.getTitle() + "' ("
 				  + course.getId().toExternalString() + ")");
 			  }
 			  started = false;
@@ -211,9 +210,9 @@ public class Fixer {
 			  started = false;
 			  completed = false;
 			  errored = true;
-			  logMessage(0, "---------------------------------------------------");
-			  logMessage(0, "An error occurred: " + e.getMessage());
-			  logMessage(0, "See Blackboard service logs for details");
+			  utils.log(0, "---------------------------------------------------");
+			  utils.log(0, "An error occurred: " + e.getMessage());
+			  utils.log(0, "See Blackboard service logs for details");
 			  bbLogs.logError("An error occurred trying to migrate openEQUELLA content links", e);
 			}
 		  }
@@ -235,17 +234,17 @@ public class Fixer {
 	  boolean tleResource = handler.equals("resource/tle-resource") || handler.equals("resource/tle-myitem")
 		|| handler.equals("resource/tle-plan");
 	  if (tleResource) {
-		logMessage(level, content, "content to migrate");
+		prettyPrint(level, content, "content to migrate");
 
 		try {
 		  fixContent(courseToc, course, content, level, placementExternalId);
-		  logMessage(level, content, "migrated content");
+		  prettyPrint(level, content, "migrated content");
 
 		} catch (Exception ex) {
-		  logMessage(level, ex, "Updating ERROR");
+		  utils.log(level, ex, "Updating ERROR");
 		}
 	  } else {
-		logMessage(level, content, "content with unknown handle (unable to migrate)");
+		prettyPrint(level, content, "content with unknown handle (unable to migrate)");
 
 	  }
 	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1);
@@ -257,10 +256,10 @@ public class Fixer {
 	  Iterator<String> i = map.keySet().iterator();
 	  while (i.hasNext()) {
 		String attribute = i.next();
-		logMessage(level, label + " : " + attribute + " : " + map.get(attribute));
+		utils.log(level, label + " : " + attribute + " : " + map.get(attribute));
 	  }
 	} catch (Exception exc) {
-	  logMessage(level, label + " error : " + exc.getMessage());
+	  utils.log(level, label + " error : " + exc.getMessage());
 	}
   }
 
@@ -269,7 +268,7 @@ public class Fixer {
   }
 
   private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId) throws Exception {
-	logMessage(level, "Link migration notes for " + ltiContent.getTitle());
+	utils.log(level, "Link migration notes for " + ltiContent.getTitle());
 	equellaLookedAt++;
 
 	ExtendedData extendedData = ltiContent.getExtendedData();
@@ -279,62 +278,72 @@ public class Fixer {
 	try {
 	  itemInfo = ContentUtil.instance().ensureProperties(ltiContent, course, ltiContent.getParentId(), equellaURL);
 	  if( itemInfo == null) {
-		logMessage(level+1, "oEQ item info is null - unable to migrate link");
+		utils.log(level+1, "oEQ item info is null - unable to migrate link");
 		return;
 	  }
 	} catch (Exception t) {
-	  logMessage(level+1, t, "Error retrieving item info - unable to migrate link");
+	  utils.log(level+1, t, "Error retrieving item info - unable to migrate link");
 	  return;
 	}
 
 	final ItemKey itemkey = itemInfo.getItemKey();
 	if( itemkey == null) {
-	  logMessage(level+1, "oEQ item key is null - unable to migrate link");
+	  utils.log(level+1, "oEQ item key is null - unable to migrate link");
 	  return;
 	}
 
-	//Update the URL
-	final String xdUrl = extendedData.getValue("url");
-	if(xdUrl == null) {
-	  logMessage(level+1, "oEQ link is null - unable to migrate link");
-	  return;
-	} else if(StringUtils.isEmpty(xdUrl)) {
-	  logMessage(level+1, "oEQ link is empty - unable to migrate link");
+	// Try various migration methods to see if the content is in a known format
+	FixerResponse fixerResponse = utils.migrate(
+	  level,
+	  equellaURL,
+	  extendedData.getValue("url"),
+	  extendedData.getValue("attachmentName"),
+	  extendedData.getValue("description"),
+	  ltiContent.getBody().getFormattedText());
+
+	if(!fixerResponse.isValidResponse()) {
+	  // Stop link migration
 	  return;
 	}
 
-	String newUrl = equellaURL + xdUrl;
-	logMessage(level+1, "NewUrl: " + newUrl);
-	ltiContent.setUrl(newUrl);
+	// Update the URL
+	ltiContent.setUrl(fixerResponse.getNewUrl());
 
-	//Update the Host
-	String newUrlHost = getDomainName(equellaURL);
-	logMessage(level+1, "NewUrlHost: " + newUrlHost);
+	// Update the Host
+	String newUrlHost = FixerUtils.getDomainName(equellaURL);
+	utils.log(level+1, "NewUrlHost: " + newUrlHost);
 	ltiContent.getBbAttributes().setString("UrlHost", newUrlHost);
 
-	//Update the Type
+	// Update body
+	ltiContent.setBody(new FormattedText(fixerResponse.getNewBody(),FormattedText.Type.HTML));
+
+	// Update link type
 	ltiContent.setContentHandler("resource/x-bb-blti-link");
 
-	//Update the content body (remove the link)
-	String htmlContent = ltiContent.getBody().getFormattedText();
-	String toRemove = StringUtils.substringBetween(htmlContent, "<div class=\"equella-link", "</div>");
-	htmlContent = StringUtils.remove(htmlContent,toRemove);
-	FormattedText newFormattedText = new FormattedText(htmlContent,FormattedText.Type.HTML);
-	ltiContent.setBody(newFormattedText);
+	// Update link name if Bb link title is empty
+	if(StringUtils.isEmpty(ltiContent.getTitle())) {
+	  ltiContent.setTitle(fixerResponse.getNewName());
+	}
 
-	//Update the extended data
+	// Update link description (if any found) and Bb link short description is empty
+	if(StringUtils.isEmpty(ltiContent.getShortDescription()) &&
+	  !StringUtils.isEmpty(fixerResponse.getNewDescription())) {
+	  ltiContent.setShortDescription(fixerResponse.getNewDescription());
+	}
+
+	// Update the extended data
 	Map<String, String> values = new HashMap<>();
 	values.put("customParameters", "");
 	values.put("cimPlacementId", placementExternalId);
-	logMessage(level+1, "PlacementId: " + placementExternalId);
+	utils.log(level+1, "PlacementId: " + placementExternalId);
 	values.put("itemOrigin", "CIM");
 	extendedData.setValues(values);
 	mapToString(values,level+1, "New Extended Data");
 
-	// persist it
+	// persist new link
 	contentDbPersister.persist(ltiContent);
 	fixedItems++;
-	logMessage(level+1, "Migrated link");
+	utils.log(level+1, "Migrated link persisted to database");
   }
 
   public String getStatus() {
@@ -397,79 +406,35 @@ public class Fixer {
 	}
   }
 
-  public String getLog()
-  {
-	return log.toString();
-  }
-
-  protected void logMessage(int lvl, String msg)
-  {
-	log.append(loggerPadding(lvl) + msg + "\n");
-	bbLogs.logWarning("[oEQ Link Migrator] " + msg);
-  }
-
-  protected void logMessage(int lvl, Content c, String label) {
-	logMessage(lvl, "Beginning display of " + label + " - " + c.getTitle());
-	logMessage(lvl+1, "ID: " + c.getId().toExternalString());
+  protected void prettyPrint(int lvl, Content c, String label) {
+	utils.log(lvl, "Beginning display of " + label + " - " + c.getTitle());
+	utils.log(lvl+1, "ID: " + c.getId().toExternalString());
 	final Content pContent = c.getParent();
 	if(pContent == null) {
-	  logMessage(lvl+1, "Parent ID: null");
+	  utils.log(lvl+1, "Parent ID: null");
 	} else {
-	  logMessage(lvl+1, "Parent ID: " + pContent.getId().toExternalString() + " (" + pContent.getTitle() + ")");
+	  utils.log(lvl+1, "Parent ID: " + pContent.getId().toExternalString() + " (" + pContent.getTitle() + ")");
 	}
-	logMessage(lvl+1, "Course ID: " + c.getCourseId().toExternalString());
-	logMessage(lvl+1, "Content handler: " + c.getContentHandler());
-	logMessage(lvl+1, "Link ref: " + c.getLinkRef());
-	logMessage(lvl+1, "Body ([lt] == <): " + c.getBody().getText().replaceAll("<", "[lt]"));
-	logMessage(lvl+1, "Short Description: " + c.getShortDescription());
-	logMessage(lvl+1, "URL: " + c.getUrl());
-	logMessage(lvl+1, "URL Host: " + c.getUrlHost());
+	utils.log(lvl+1, "Course ID: " + c.getCourseId().toExternalString());
+	utils.log(lvl+1, "Content handler: " + c.getContentHandler());
+	utils.log(lvl+1, "Link ref: " + c.getLinkRef());
+	utils.log(lvl+1, "Body ([lt] == <): " + c.getBody().getText().replaceAll("<", "[lt]"));
+	utils.log(lvl+1, "Short Description: " + c.getShortDescription());
+	utils.log(lvl+1, "URL: " + c.getUrl());
+	utils.log(lvl+1, "URL Host: " + c.getUrlHost());
 
 	try {
-	  logMessage(lvl+1, "Data type: " + c.getDataType().getName());
+	  utils.log(lvl+1, "Data type: " + c.getDataType().getName());
 	} catch (Exception exc) {
-	  logMessage(lvl+1, exc,"Error with retrieving data type");
+	  utils.log(lvl+1, exc,"Error with retrieving data type");
 	}
 	ExtendedData xData = c.getExtendedData();
 	if (xData != null) {
 	  mapToString(xData.getValues(), lvl+1, "Extended data");
 	} else {
-	  logMessage(lvl+1, "Extended data is null for '" + label + "'");
+	  utils.log(lvl+1, "Extended data is null for '" + label + "'");
 	}
-	logMessage(lvl, "Completed display of " + label + " - " + c.getTitle());
-  }
-
-  protected void logMessage(int lvl, Exception e, String label) {
-	logMessage(0, e, label + ": " + e.getMessage());
-	for (StackTraceElement element : e.getStackTrace()) {
-	  logMessage(0, element.toString());
-	}
-  }
-
-  private String loggerPadding(int level)
-  {
-    String pattern = "yyyy-MM-dd HH:mm:ss.SSS";
-	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
-	String date = simpleDateFormat.format(new Date());
-    String pad = "[" + date + "]";
-	for( int lvl = 0; lvl < level; lvl++ )
-	{
-	  pad += "  ";
-	}
-	return pad;
-  }
-
-  public static String getDomainName(String url) throws MalformedURLException {
-	if (!url.startsWith("http") && !url.startsWith("https")) {
-	  url = "http://" + url;
-	}
-	URL netUrl = new URL(url);
-	String host = netUrl.getHost();
-	if (host.startsWith("www")) {
-	  host = host.substring("www".length() + 1);
-	}
-	return host;
+	utils.log(lvl, "Completed display of " + label + " - " + c.getTitle());
   }
 
   public String getPlacementHandle() {
@@ -478,5 +443,9 @@ public class Fixer {
 
   public void setPlacementHandle(String placementHandle) {
 	this.placementHandle = placementHandle;
+  }
+
+  public String getLog() {
+    return utils.getLog();
   }
 }
