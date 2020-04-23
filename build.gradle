@@ -133,7 +133,7 @@ project(':oeqLinkMigrationLTI') {
   task buildLinkMigration() {
     group 'oEQ'
     description 'Precompiles the JSPs, compiles the source, and packages the building block as a WAR'
-    dependsOn buildWar
+    dependsOn clean, test, buildWar
   }
 }
 
