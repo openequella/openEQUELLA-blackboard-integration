@@ -179,29 +179,29 @@ public class FixerUtils {
    * 3) For the description, use the value in the body:
    *   ...<table border="0" cellspacing="0" cellpadding="0" style="font-size:12pt" width="100%"><tr><td>[link description]</td>...
    */
-  public FixerResponse migrate(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody) {
+  public FixerResponse migrate(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody, String[] urls) {
 	// Try various migration methods to see if the content is in a known format
 	FixerResponse fixed = migrateViaExtendedData(level, oequrl, xDUrl, xDTitle, xDDesc, htmlBody);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
-	fixed = migrateViaAttachmentBySelectedUuid(level, oequrl, htmlBody);
+	fixed = migrateViaAttachmentBySelectedUuid(level, oequrl, htmlBody, urls);
 
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
-	fixed = migrateViaAttachmentBySelectedIntegLink(level, htmlBody);
+	fixed = migrateViaAttachmentBySelectedIntegLink(level, htmlBody, urls);
 
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
 
-	fixed = migrateViaAttachmentBySelectedFilename(level, oequrl, htmlBody);
+	fixed = migrateViaAttachmentBySelectedFilename(level, oequrl, htmlBody, urls);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
 
-	fixed = migrateViaOnlySummary(level, oequrl, htmlBody);
+	fixed = migrateViaOnlySummary(level, oequrl, htmlBody, urls);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
@@ -237,7 +237,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedUuid(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedUuid(int level, String oequrl, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedUuid";
 	FixerResponse fr = new FixerResponse();
 
@@ -269,7 +269,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion) + "?attachment.uuid=" + attUuid);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, flow, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -280,7 +280,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedIntegLink(int level, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedIntegLink(int level, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedIntegLink";
 	FixerResponse fr = new FixerResponse();
 
@@ -328,7 +328,7 @@ public class FixerUtils {
 	fr.setNewUrl(attIntegLink);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, flow, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -339,7 +339,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedFilename(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedFilename(int level, String oequrl, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedFilename";
 
 	FixerResponse fr = new FixerResponse();
@@ -367,7 +367,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion) + attFilename);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, flow, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -378,7 +378,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaOnlySummary(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaOnlySummary(int level, String oequrl, String htmlBody, String[] imageUrls) {
     final String flow = "OnlySummary";
 	FixerResponse fr = new FixerResponse();
 
@@ -398,7 +398,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion));
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, flow, imageUrls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -421,15 +421,55 @@ public class FixerUtils {
 	}
   }
 
-  private String removeOldIntegLink(String str, int level, String method) {
+  private String scrubDescription(String str, int level, String method, String[] urls) {
     final String start = "<td><table";
     final String end = "</table></td></tr>";
-     final String toRemove = StringUtils.substringBetween(str, start, end);
-     if(toRemove.contains("href=\"/webapps/dych-tle-")) {
-       return StringUtils.replace(str,start+toRemove+end, "<td/></tr>");
-	 } else {
-       log(level+1, "Not removing old integration link from the body - could not find the 'dych-tle' table");
-       return str;
+     final String[] toRemovePossibilities = StringUtils.substringsBetween(str, start, end);
+     for(String toRemove : toRemovePossibilities) {
+	   if (toRemove.contains("href=\"/webapps/dych-tle-")) {
+		 log(level + 1, "Found old 'dych-tle' table in the body / description.  Replacing old link.");
+		 str = StringUtils.replace(str, start + toRemove + end, "<td/></tr>");
+
+		 // Three possible ways these icons / images are known to appear.
+		 final String[] startImgBlockArr = {"<tr>", "<td", "colspan=\"2\">", "<img", "src=\""};
+		 final String startImgBlock = createIgnoreWhitespaceRegex(startImgBlockArr);
+		 final String[] endImgBlock1Arr = {"\"", "alt=\".\"", "style=", "\"", "border:none;", "width:0px;", "height:4px;", "\"", "/>", "</td>", "</tr>"};
+		 final String endImgBlock1 = createIgnoreWhitespaceRegex(endImgBlock1Arr);
+
+		 final String[] endImgBlock2Arr = {"\"", "alt=\".\"", "style=", "\"", "border:none;", "width:0px;", "height:5px;", "\"", "/>", "</td>", "</tr>"};
+		 final String endImgBlock2 = createIgnoreWhitespaceRegex(endImgBlock2Arr);
+
+		 final String[] startImgBlock3Arr = {"<td", ">", "<img", "src=\""};
+		 final String startImgBlock3 = createIgnoreWhitespaceRegex(startImgBlock3Arr);
+		 final String[] endImgBlock3Arr = {"\"", "alt=\".\"", "style=", "\"", "border:none;", "\"", "/>", "</td>"};
+		 final String endImgBlock3 = createIgnoreWhitespaceRegex(endImgBlock3Arr);
+
+
+		 for (String imgUrl : urls) {
+		   final String wholeImgBlock1 = startImgBlock + imgUrl + endImgBlock1;
+		   final String wholeImgBlock2 = startImgBlock + imgUrl + endImgBlock2;
+		   final String wholeImgBlock3 = startImgBlock3 + imgUrl + endImgBlock3;
+		   log(level + 1, "Removing various forms of the image block from description: " + imgUrl);
+		   str = str.replaceAll(wholeImgBlock1, ""); // remove the <tr ... /> completely
+		   str = str.replaceAll(wholeImgBlock2, ""); // remove the <tr ... /> completely
+		   str = str.replaceAll(wholeImgBlock3, "<td />"); // should be removed when removing the description, but just in case.
+		 }
+		 // Assumes only one dych-tle link in the description
+		 return str;
+	   }
 	 }
+
+	 log(level+1, "Not removing old integration link or image URLs from the body - could not find the 'dych-tle' table");
+	 return str;
+  }
+
+  private String createIgnoreWhitespaceRegex(String[] elements) {
+    StringBuilder sb = new StringBuilder();
+    final String spaceRegex = "\\s*?";
+    sb.append(spaceRegex);
+    for(String e : elements) {
+      sb.append(e).append(spaceRegex);
+	}
+	return sb.toString();
   }
 }

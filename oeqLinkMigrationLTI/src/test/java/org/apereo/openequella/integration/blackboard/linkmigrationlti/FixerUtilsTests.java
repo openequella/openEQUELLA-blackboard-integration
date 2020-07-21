@@ -197,16 +197,17 @@ public class FixerUtilsTests {
 	"<file>att name. in att file.pptx</file><description>att desc. in att desc.pptx</description>" +
 	"</attachment></attachments></item>--><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" " +
 	"style=\"font-size:12pt\" width=\"450px\"><tr><td  colspan=\"2\"><img " +
-	"src=\"https://apereo.org/images/spacer.gif\" alt=\" \" style=\"border:none; " +
+	"src=\"https://apereo.org/images/spacer.gif\"\t \r \n alt=\" \" style=\"border:none; " +
 	"width:0px; height:4px;\" /></td></tr><tr><td valign=\"top\"><table border=\"0\" cellspacing=\"0\" " +
-	"cellpadding=\"0\" style=\"font-size:12pt\" width=\"100%\"><tr><td></td></tr><tr><td  colspan=\"2\">" +
-	"<img src=\"https://apereo.org/images/spacer.gif\" alt=\" \" style=\"border:none; " +
-	"width:0px; height:5px;\" /></td></tr><tr><td><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" " +
+	"cellpadding=\"0\" style=\"font-size:12pt\" width=\"100%\"><tr><td></td></tr><tr>" +
+	"<td  colspan=\"2\"><img src=\"https://apereo.org/images/spacer.gif\" alt=\"*\" style=\"border:none; " +
+	"width:0px; height:5px;\" /></td></tr>" +
+	"<tr><td><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" " +
 	"style=\"font-size:12pt\" ><td ><img src=\"https://apereo.org//icons/attachment.gif\" " +
 	"alt=\"*\" style=\"border:none;\" /></td><td>&nbsp;&nbsp;<a href=\"/webapps/dych-tle-BB599/" +
 	"ViewContent?type=default&content_id=@X@content.pk_string@X@&course_id=@X@course.pk_string@X@&page=" +
 	"randomness%20forSearch.pptx\" class=\"info\">2. Module 2 Selected Att by anchor class.pptx</a></td></table>" +
-	"</td></tr></table></td></tr></table>";
+	"</td></tr></table></td><td ><img src=\"https://apereo.org//icons/attachment.gif\" alt=\"*\" style=\"border:none;\" /></td></tr></table>";
   public static String TEST_BODY_4_CLEANED = "<!--<item id=\"ee5ee6e4-2f2e-4444-4444-ff6ee4543971\" " +
 	"itemdefid=\"ee5ee6e4-2e2e-4446-4444-ff6ee4543971\" link=\"false\" live=\"false\" " +
 	"modified=\"false\" notify=\"true\" version=\"0\"><name>test body 4 name metadata</name>" +
@@ -214,12 +215,8 @@ public class FixerUtilsTests {
 	"selectedDescription=\"\" selectedTitle=\"selected title.pptx\"><attachment scorm=\"\">" +
 	"<file>att name. in att file.pptx</file><description>att desc. in att desc.pptx</description>" +
 	"</attachment></attachments></item>--><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" " +
-	"style=\"font-size:12pt\" width=\"450px\"><tr><td  colspan=\"2\"><img " +
-	"src=\"https://apereo.org/images/spacer.gif\" alt=\" \" style=\"border:none; " +
-	"width:0px; height:4px;\" /></td></tr><tr><td valign=\"top\"><table border=\"0\" cellspacing=\"0\" " +
-	"cellpadding=\"0\" style=\"font-size:12pt\" width=\"100%\"><tr><td></td></tr><tr><td  colspan=\"2\">" +
-	"<img src=\"https://apereo.org/images/spacer.gif\" alt=\" \" style=\"border:none; " +
-	"width:0px; height:5px;\" /></td></tr><tr><td/></tr></table></td></tr></table>";
+	"style=\"font-size:12pt\" width=\"450px\"><tr><td valign=\"top\"><table border=\"0\" cellspacing=\"0\" " +
+	"cellpadding=\"0\" style=\"font-size:12pt\" width=\"100%\"><tr><td></td></tr><tr><td/></tr></table></td><td /></tr></table>";
   public static String TEST_BODY_5 = "<div class=\"equella-link contextItemDetailsHeaders\"><a target=\"_blank\" " +
 	"href=\"/webapps/dych-tle-BB59999/ViewContent?content_id=@X@content.pk_string@X@&course_id=" +
 	"@X@course.pk_string@X@\"><img alt=\"application.document\" src=\"https://apereo.org/icons/attachment.gif\" " +
@@ -276,7 +273,7 @@ public class FixerUtilsTests {
   public void testMigrateWithExtendedDataUrl() {
 	FixerUtils utils = new FixerUtils(null);
 	FixerResponse resp = utils.migrate(0, OEQ_URL, "integ/gen/uuid/version/",
-	  "xd title", "xd desc", TEST_BODY_5);
+	  "xd title", "xd desc", TEST_BODY_5, new String[0]);
 	Assert.assertEquals(utils.getLog(), true, resp.isValidResponse());
 	Assert.assertEquals(utils.getLog(), OEQ_URL + "/integ/gen/uuid/version/", resp.getNewUrl());
 	Assert.assertEquals(utils.getLog(), "xd title", resp.getNewName());
@@ -287,7 +284,7 @@ public class FixerUtilsTests {
   @Test
   public void testMigrateWithEmptyUrlAndItemSummary() {
 	FixerUtils utils = new FixerUtils(null);
-	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_1);
+	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_1, new String[0]);
 	Assert.assertEquals(utils.getLog(), true, resp.isValidResponse());
 	Assert.assertEquals(utils.getLog(), OEQ_URL + "/integ/gen/ee5ee6e4-2e2e-4444-4444-ee6c44543977/1/", resp.getNewUrl());
 	Assert.assertEquals(utils.getLog(), "Test name: is this real bb name?", resp.getNewName());
@@ -298,7 +295,7 @@ public class FixerUtilsTests {
   @Test
   public void testMigrateWithEmptyUrlAndAttachmentByUuidSelected() {
 	FixerUtils utils = new FixerUtils(null);
-	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_2);
+	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_2, new String[0]);
 	System.out.println(utils.getLog());
 	Assert.assertEquals(utils.getLog(), true, resp.isValidResponse());
 	Assert.assertEquals(utils.getLog(), OEQ_URL + "/integ/gen/ee5ee6e4-2e2e-4444-4444-ee6c44543971/0/" +
@@ -311,7 +308,7 @@ public class FixerUtilsTests {
   @Test
   public void testMigrateWithEmptyUrlAndAttachmentByIntegLinkSelected() {
 	FixerUtils utils = new FixerUtils(null);
-	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_3);
+	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_3, new String[0]);
 	utils.log(0, "PRE....:" + TEST_BODY_3);
 	utils.log(0, "POST...:" + TEST_BODY_3_CLEANED);
 	utils.log(0, "CLEANED:" + resp.getNewBody());
@@ -326,7 +323,9 @@ public class FixerUtilsTests {
   @Test
   public void testMigrateWithEmptyUrlAndViaAttachmentBySelectedFilename() {
 	FixerUtils utils = new FixerUtils(null);
-	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_4);
+	String[] urls = "https://apereo.org//icons/attachment.gif,https://apereo.org//images/spacer.gif,https://apereo.org/images/spacer.gif".split(",");
+
+	FixerResponse resp = utils.migrate(0, OEQ_URL, null, null, null, TEST_BODY_4, urls);
 	System.out.println(utils.getLog());
 	Assert.assertEquals(utils.getLog(), true, resp.isValidResponse());
 	Assert.assertEquals(utils.getLog(), "https://apereo.org/not/a/real/oeq/domain/integ/gen/ee5ee6e4-2f2e" +

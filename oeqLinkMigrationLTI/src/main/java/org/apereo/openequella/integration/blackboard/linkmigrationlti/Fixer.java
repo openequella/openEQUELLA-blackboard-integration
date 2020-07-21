@@ -18,22 +18,13 @@
 
 package org.apereo.openequella.integration.blackboard.linkmigrationlti;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.servlet.http.HttpServletRequest;
-
 import blackboard.base.BbList;
 import blackboard.base.FormattedText;
+import blackboard.data.ExtendedData;
 import blackboard.data.blti.BasicLTIPlacement;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.navigation.CourseToc;
-import blackboard.data.ExtendedData;
 import blackboard.persist.Id;
 import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
@@ -51,18 +42,29 @@ import blackboard.platform.vxi.data.VirtualHost;
 import blackboard.platform.vxi.service.VirtualInstallationManager;
 import org.apache.commons.lang.StringUtils;
 import org.apereo.openequella.integration.blackboard.common.BbContext;
-import org.apereo.openequella.integration.blackboard.common.BbLogger;
 import org.apereo.openequella.integration.blackboard.common.content.ContentUtil;
 import org.apereo.openequella.integration.blackboard.common.content.ItemInfo;
 import org.apereo.openequella.integration.blackboard.common.content.ItemKey;
-import org.apereo.openequella.integration.blackboard.common.content.RegistrationUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 @SuppressWarnings("nls")
 public class Fixer {
   public static final String EXECUTE = "execute";
+  public static final String DRYRUN = "dryrun";
   public static final String RESET = "reset";
   public static final String COURSEID = "courseId";
   public static final String PLACEMENT = "placementhandle";
+  public static final String IMAGE_URL_CSV = "imageUrlCsv";
   public static final String EQUELLA_URL = "equellaurl";
   public static final String CONFIG_FILE = "config.properties";
   protected static final String EQUELLA_BLOCK_VENDOR = "dych";
@@ -78,12 +80,17 @@ public class Fixer {
   protected boolean completed;
   protected boolean started;
   protected boolean errored;
+  protected String dryrunStr;
   protected int percent;
   protected int lookedAt;
   protected int equellaLookedAt;
   protected int fixedItems;
+
   private String placementHandle;
   private String courseId;
+  private String imageUrlCsv;
+  private String[] imageUrlsToScrub;
+
   protected String equellaUrl = "";
   protected FixerUtils utils;
 
@@ -141,13 +148,35 @@ public class Fixer {
 
     placementHandle = request.getParameter(PLACEMENT);
 	courseId = request.getParameter(COURSEID);
-	if (request.getParameter(EXECUTE) != null && StringUtils.isNotEmpty(placementHandle)) {
+	imageUrlCsv = request.getParameter(IMAGE_URL_CSV);
+	final boolean dryrun = request.getParameter(DRYRUN) != null;
+	dryrunStr = dryrun ? "DRY RUN MODE:  " : "";
+
+	final boolean execute = request.getParameter(EXECUTE) != null;
+
+	if(execute && dryrun) {
+	  utils.log(0, "Please select [DRY RUN] or [START MIGRATION], but not both.");
+	  started = false;
+	  completed = false;
+	  errored = true;
+	  return;
+	}
+
+	if ((execute || dryrun) && StringUtils.isNotEmpty(placementHandle)) {
 	  if (!started && !completed) {
 		started = true;
 		Runnable runner = new Runnable() {
 		  @Override
 		  public void run() {
 			try {
+			  if(dryrun) {
+				utils.log(0, dryrunStr + "No changes to the content will be performed");
+			  }
+			  imageUrlsToScrub = imageUrlCsv.split(",");
+			  utils.log(0, "Config - Image URLs: [" + Arrays.toString(imageUrlsToScrub) + "]");
+			  utils.log(0, "Config - Placement handle: [" + placementHandle + "]");
+			  utils.log(0, "Config - CourseID: " + courseId + "]");
+
 			  BasicLTIPlacement placement = null;
 
 			  utils.log(0, "Loading placement...");
@@ -197,7 +226,7 @@ public class Fixer {
 				  CourseToc courseToc = (CourseToc) courseTocs.get(j);
 
 				  recurseContent(contentDbLoader, courseToc, course,
-					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 0);
+					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 0, dryrun);
 				}
 
 				utils.log(0, "Finished review of course '" + course.getTitle() + "' ("
@@ -222,7 +251,7 @@ public class Fixer {
 	}
   }
 
-  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, Course course, BbList contentList, String placementExternalId, int level)
+  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, Course course, BbList contentList, String placementExternalId, int level, boolean dryrun)
 	throws Exception {
 	for (int j = 0; j < contentList.size(); j++) {
 
@@ -237,8 +266,8 @@ public class Fixer {
 		prettyPrint(level, content, "content to migrate");
 
 		try {
-		  fixContent(courseToc, course, content, level, placementExternalId);
-		  prettyPrint(level, content, "migrated content");
+		  fixContent(courseToc, course, content, level, placementExternalId, dryrun);
+		  prettyPrint(level, content, dryrunStr + "migrated content");
 
 		} catch (Exception ex) {
 		  utils.log(level, ex, "Updating ERROR");
@@ -247,7 +276,7 @@ public class Fixer {
 		prettyPrint(level, content, "content with unknown handle (unable to migrate)");
 
 	  }
-	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1);
+	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1, dryrun);
 	}
   }
 
@@ -267,7 +296,7 @@ public class Fixer {
 	return contentLoader.loadChildren(bbContentId);
   }
 
-  private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId) throws Exception {
+  private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId, boolean dryrun) throws Exception {
 	utils.log(level, "Link migration notes for " + ltiContent.getTitle());
 	equellaLookedAt++;
 
@@ -299,7 +328,8 @@ public class Fixer {
 	  extendedData.getValue("url"),
 	  extendedData.getValue("attachmentName"),
 	  extendedData.getValue("description"),
-	  ltiContent.getBody().getFormattedText());
+	  ltiContent.getBody().getFormattedText(),
+	  imageUrlsToScrub);
 
 	if(!fixerResponse.isValidResponse()) {
 	  // Stop link migration
@@ -340,10 +370,15 @@ public class Fixer {
 	extendedData.setValues(values);
 	mapToString(values,level+1, "New Extended Data");
 
-	// persist new link
-	contentDbPersister.persist(ltiContent);
+	// persist it
+	if(dryrun) {
+	  utils.log(level + 1, dryrunStr + "Would have migrated link, but did not.");
+	} else {
+	  // persist new link
+	  contentDbPersister.persist(ltiContent);
+	  utils.log(level+1, "Migrated link persisted to database");
+	}
 	fixedItems++;
-	utils.log(level+1, "Migrated link persisted to database");
   }
 
   public String getStatus() {
