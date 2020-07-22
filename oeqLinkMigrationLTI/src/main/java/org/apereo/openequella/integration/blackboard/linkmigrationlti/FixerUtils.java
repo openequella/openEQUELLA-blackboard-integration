@@ -20,6 +20,12 @@ package org.apereo.openequella.integration.blackboard.linkmigrationlti;
 
 import blackboard.platform.log.LogService;
 import org.apache.commons.lang.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -179,29 +185,29 @@ public class FixerUtils {
    * 3) For the description, use the value in the body:
    *   ...<table border="0" cellspacing="0" cellpadding="0" style="font-size:12pt" width="100%"><tr><td>[link description]</td>...
    */
-  public FixerResponse migrate(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody) {
+  public FixerResponse migrate(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody, String[] urls) {
 	// Try various migration methods to see if the content is in a known format
-	FixerResponse fixed = migrateViaExtendedData(level, oequrl, xDUrl, xDTitle, xDDesc, htmlBody);
+	FixerResponse fixed = migrateViaExtendedData(level, oequrl, xDUrl, xDTitle, xDDesc, htmlBody, urls);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
-	fixed = migrateViaAttachmentBySelectedUuid(level, oequrl, htmlBody);
+	fixed = migrateViaAttachmentBySelectedUuid(level, oequrl, htmlBody, urls);
 
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
-	fixed = migrateViaAttachmentBySelectedIntegLink(level, htmlBody);
+	fixed = migrateViaAttachmentBySelectedIntegLink(level, htmlBody, urls);
 
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
 
-	fixed = migrateViaAttachmentBySelectedFilename(level, oequrl, htmlBody);
+	fixed = migrateViaAttachmentBySelectedFilename(level, oequrl, htmlBody, urls);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
 
-	fixed = migrateViaOnlySummary(level, oequrl, htmlBody);
+	fixed = migrateViaOnlySummary(level, oequrl, htmlBody, urls);
 	if(fixed.isValidResponse()) {
 	  return fixed;
 	}
@@ -210,7 +216,7 @@ public class FixerUtils {
 	return fixed;
   }
 
-  private FixerResponse migrateViaExtendedData(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody) {
+  private FixerResponse migrateViaExtendedData(int level, String oequrl, String xDUrl, String xDTitle, String xDDesc, String htmlBody, String[] urls) {
 	final String flow = "ExtendedData";
 	FixerResponse fr = new FixerResponse();
     fr.setValidResponse(isUrlPresent(level, xDUrl));
@@ -225,8 +231,7 @@ public class FixerUtils {
 	fr.setNewUrl(oequrl + separator + cleanedXDUrl);
 
 	// Update the content body (remove the link)
-	String toRemove = StringUtils.substringBetween(htmlBody, "<div class=\"equella-link", "</div>");
-	fr.setNewBody(StringUtils.remove(htmlBody,toRemove).replaceFirst("class=\"equella-link","class=\"equella-link\">"));
+	fr.setNewBody(scrubDescription(htmlBody, level, urls));
 
 	fr.setNewName(xDTitle);
 
@@ -237,7 +242,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedUuid(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedUuid(int level, String oequrl, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedUuid";
 	FixerResponse fr = new FixerResponse();
 
@@ -269,7 +274,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion) + "?attachment.uuid=" + attUuid);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -280,7 +285,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedIntegLink(int level, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedIntegLink(int level, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedIntegLink";
 	FixerResponse fr = new FixerResponse();
 
@@ -328,7 +333,7 @@ public class FixerUtils {
 	fr.setNewUrl(attIntegLink);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -339,7 +344,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaAttachmentBySelectedFilename(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaAttachmentBySelectedFilename(int level, String oequrl, String htmlBody, String[] urls) {
 	final String flow = "AttachmentBySelectedFilename";
 
 	FixerResponse fr = new FixerResponse();
@@ -367,7 +372,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion) + attFilename);
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, urls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -378,7 +383,7 @@ public class FixerUtils {
 	return fr;
   }
 
-  private FixerResponse migrateViaOnlySummary(int level, String oequrl, String htmlBody) {
+  private FixerResponse migrateViaOnlySummary(int level, String oequrl, String htmlBody, String[] imageUrls) {
     final String flow = "OnlySummary";
 	FixerResponse fr = new FixerResponse();
 
@@ -398,7 +403,7 @@ public class FixerUtils {
 	fr.setNewUrl(buildOeqIntegUrl(oequrl, itemId, itemVersion));
 	fr.setValidResponse(true);
 
-	fr.setNewBody(removeOldIntegLink(htmlBody, level, flow));
+	fr.setNewBody(scrubDescription(htmlBody, level, imageUrls));
 
 	setNameAndDescription(fr, htmlBody, level, flow);
 
@@ -421,15 +426,58 @@ public class FixerUtils {
 	}
   }
 
-  private String removeOldIntegLink(String str, int level, String method) {
-    final String start = "<td><table";
-    final String end = "</table></td></tr>";
-     final String toRemove = StringUtils.substringBetween(str, start, end);
-     if(toRemove.contains("href=\"/webapps/dych-tle-")) {
-       return StringUtils.replace(str,start+toRemove+end, "<td/></tr>");
-	 } else {
-       log(level+1, "Not removing old integration link from the body - could not find the 'dych-tle' table");
-       return str;
-	 }
+  private String scrubDescription(String str, int level, String[] urls) {
+    Document d = Jsoup.parse(str);
+    d.outputSettings().prettyPrint(false);
+
+    // Remove all old integration links
+    Elements elems = d.select("a[href^=\"/webapps/dych-tle-\"]");
+    for(Element e : elems) {
+        e.remove();
+        log(level + 1, "Removing the element ([lt] == <): " + e.outerHtml().replaceAll("<", "[lt]"));
+	}
+
+	// Remove all old image spacers
+	elems = d.select("img");
+	for(Element e : elems) {
+	  scrubForUrls(e, level, urls);
+	}
+
+	StringBuilder result = new StringBuilder();
+	for(Node n : d.childNodes()) {
+	  // Keep any top level comments
+	  if (n instanceof Comment) {
+	    result.append(n.outerHtml());
+	  }
+	}
+
+	// Keep the inner html of the body
+	result.append(d.body().html());
+    return result.toString();
+
+  }
+
+  private void scrubForUrls(Element e, int level, String[] urls) {
+	for(String urlToTest : urls) {
+	  if (e.attr("src").equals(urlToTest)) {
+	    if(e.hasParent() &&
+		  e.parent().hasParent() &&
+		  e.parent().tagName().equals("td") &&
+		  e.parent().parent().tagName().equals("tr") &&
+		  e.parent().text().trim().length() == 0 &&
+		  e.parent().parent().text().trim().length() == 0 &&
+		  (e.parent().childNodeSize() == 1) &&
+		  (e.parent().parent().childNodeSize() == 1)) {
+			// If the img is the only element in the form <tr><td><img .../></td></tr> , remove the tr
+		  log(level + 1, "Removing the element ([lt] == <): " + e.parent().parent().outerHtml().replaceAll("<", "[lt]"));
+		  e.parent().parent().remove();
+		} else {
+		  log(level + 1, "Removing the element ([lt] == <): " + e.outerHtml().replaceAll("<", "[lt]"));
+		  e.remove();
+		}
+
+		return;
+	  }
+	}
   }
 }

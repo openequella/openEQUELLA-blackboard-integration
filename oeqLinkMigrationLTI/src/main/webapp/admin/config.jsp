@@ -64,6 +64,9 @@
             <ui:dataElement label="Course External ID (Empty for all the courses)">
                        <input type="text" size="75" name="<%=Fixer.COURSEID%>"/>
             </ui:dataElement>
+            <ui:dataElement label="Image URLs to Remove (CSV)">
+                       <input type="text" size="75" name="<%=Fixer.IMAGE_URL_CSV%>"/>
+            </ui:dataElement>
 				</ui:step>
 
 				<%
@@ -78,9 +81,15 @@
 				<%
 				} else if (!fixer.hasStarted() && !fixer.hasCompleted()) {
 				%>
-          <ui:step title="Confirmation">
+          <ui:step title="Start Migration">
             <ui:dataElement label="Check this box to begin execution when the Submit button is clicked">
                 <input type="checkbox" name="<%=Fixer.EXECUTE%>" />
+              </ui:dataElement>
+          </ui:step>
+
+          <ui:step title="Dry Run">
+            <ui:dataElement label="Check this box to perform a DRY RUN when the Submit button is clicked">
+                <input type="checkbox" name="<%=Fixer.DRYRUN%>" />
               </ui:dataElement>
           </ui:step>
         <%
