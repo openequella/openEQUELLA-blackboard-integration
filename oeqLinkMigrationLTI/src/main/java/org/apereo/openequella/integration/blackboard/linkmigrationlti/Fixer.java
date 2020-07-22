@@ -376,7 +376,7 @@ public class Fixer {
 	} else {
 	  // persist new link
 	  contentDbPersister.persist(ltiContent);
-	  utils.log(level+1, "Migrated link persisted to database");
+	  utils.log(level + 1, "Migrated link persisted to database");
 	}
 	fixedItems++;
   }
