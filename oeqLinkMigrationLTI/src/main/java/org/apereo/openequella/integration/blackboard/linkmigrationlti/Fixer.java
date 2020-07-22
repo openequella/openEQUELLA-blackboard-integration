@@ -371,7 +371,7 @@ public class Fixer {
 	mapToString(values,level+1, "New Extended Data");
 
 	// persist it
-	if(dryrun) {
+	if (dryrun) {
 	  utils.log(level + 1, dryrunStr + "Would have migrated link, but did not.");
 	} else {
 	  // persist new link
