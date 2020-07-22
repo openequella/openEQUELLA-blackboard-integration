@@ -154,7 +154,7 @@ public class Fixer {
 
 	final boolean execute = request.getParameter(EXECUTE) != null;
 
-	if(execute && dryrun) {
+	if (execute && dryrun) {
 	  utils.log(0, "Please select [DRY RUN] or [START MIGRATION], but not both.");
 	  started = false;
 	  completed = false;
