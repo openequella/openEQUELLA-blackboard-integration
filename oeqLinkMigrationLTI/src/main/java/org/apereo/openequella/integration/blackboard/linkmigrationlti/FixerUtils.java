@@ -431,12 +431,10 @@ public class FixerUtils {
     d.outputSettings().prettyPrint(false);
 
     // Remove all old integration links
-    Elements elems = d.select("a[href]");
+    Elements elems = d.select("a[href^=\"/webapps/dych-tle-\"]");
     for(Element e : elems) {
-      if (e.attr("href").startsWith("/webapps/dych-tle-")) {
         e.remove();
         log(level + 1, "Removing the element ([lt] == <): " + e.outerHtml().replaceAll("<", "[lt]"));
-	  }
 	}
 
 	// Remove all old image spacers
