@@ -168,6 +168,11 @@ public class Fixer {
 		Runnable runner = new Runnable() {
 		  @Override
 		  public void run() {
+		    // At the start of any run, reset the stats
+			// `percent` is reset elsewhere, so ignore for this
+			lookedAt = 0;
+			equellaLookedAt = 0;
+			fixedItems = 0;
 			try {
 			  if(dryrun) {
 				utils.log(0, dryrunStr + "No changes to the content will be performed");
