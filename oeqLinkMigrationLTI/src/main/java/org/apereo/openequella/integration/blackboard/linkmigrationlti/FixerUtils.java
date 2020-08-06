@@ -25,6 +25,7 @@ import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.net.MalformedURLException;
@@ -433,9 +434,17 @@ public class FixerUtils {
     // Remove all old integration links
     Elements elems = d.select("a[href^=\"/webapps/dych-tle-\"]");
     for(Element e : elems) {
-        e.remove();
-        log(level + 1, "Removing the element ([lt] == <): " + e.outerHtml().replaceAll("<", "[lt]"));
-	}
+      	final String origElem = e.outerHtml();
+      	if(e.hasText() && e.hasParent()) {
+      	  // Leave the visible text of the link intact to provide more context
+		  TextNode textNode = new TextNode(e.text());
+      	  e.replaceWith(textNode);
+		  log(level + 1, "Replacing the element ([lt] == <): " + origElem.replaceAll("<", "[lt]") + " with: " + e.outerHtml().replaceAll("<", "[lt]"));
+		} else {
+      	   e.remove();
+		  log(level + 1, "Removing the element ([lt] == <): " + origElem.replaceAll("<", "[lt]"));
+		}
+    }
 
 	// Remove all old image spacers
 	elems = d.select("img");
