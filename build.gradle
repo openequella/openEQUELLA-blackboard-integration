@@ -2,7 +2,7 @@ buildscript {
   println("Building with Bb API [${bbLearnVersion}] ");
 
   repositories {
-    jcenter()
+    mavenCentral()
   }
 
   dependencies {
@@ -12,7 +12,7 @@ buildscript {
 }
 
 plugins {
-  id 'nebula.lint' version '16.9.1'
+  id 'nebula.lint' version '17.3.2'
 }
 
 allprojects {
@@ -38,16 +38,17 @@ allprojects {
     providedCompile( "blackboard.platform:bb-cms-admin:${bbLearnVersion}" ) { transitive = false }
     providedCompile "javax.servlet:javax.servlet-api:${servletApiVersion}";
     providedCompile "javax.servlet.jsp:javax.servlet.jsp-api:${jspApiVersion}";
-    compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
-    compile group: 'log4j', name: 'log4j', version: '1.2.17'
-    compile group: 'log4j', name: 'log4j', version: '1.2.17'
-    compile group: 'org.apache.cxf', name: 'cxf-bundle', version: '2.7.18'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
-    compile group: 'org.apache.struts', name: 'struts-taglib', version: '1.3.10'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+    implementation group: 'org.apache.cxf', name: 'cxf-bundle', version: '2.7.18'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
+    implementation group: 'org.apache.struts', name: 'struts-taglib', version: '1.3.10'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.1'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:23.0'
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
 
     // Use JUnit test framework
     testImplementation "junit:junit:${junitVersion}"
@@ -104,7 +105,7 @@ allprojects {
 
 project(':oeqAuditB2') {
   dependencies {
-    compile project(':oeqCommon')
+    implementation project(':oeqCommon')
   }
 
   task buildB2() {
@@ -116,7 +117,7 @@ project(':oeqAuditB2') {
 
 project(':oeqPrimaryB2') {
   dependencies {
-    compile project(':oeqCommon')
+    implementation project(':oeqCommon')
   }
 
   task buildB2() {
@@ -128,7 +129,7 @@ project(':oeqPrimaryB2') {
 
 project(':oeqLinkMigrationLTI') {
   dependencies {
-    compile project(':oeqCommon')
+    implementation project(':oeqCommon')
   }
 
   task buildLinkMigration() {
@@ -140,7 +141,7 @@ project(':oeqLinkMigrationLTI') {
 
 project(':oeqPrimaryWS') {
   dependencies {
-    compile project(':oeqCommon')
+    implementation project(':oeqCommon')
   }
 
   task generateJavadoc(type: Javadoc) {
@@ -148,8 +149,8 @@ project(':oeqPrimaryWS') {
   }
 
   task zipJavadoc(type: Zip, dependsOn: generateJavadoc) {
-    archiveName 'documentation.zip'
-    destinationDir buildDir
+    archiveFileName = 'documentation.zip'
+    destinationDirectory = buildDir
     from ("${buildDir}/docs/javadoc") {
       into 'documentation'
     }
@@ -160,7 +161,7 @@ project(':oeqPrimaryWS') {
     dependsOn zipJavadoc
     group 'oEQ'
     description 'Compiles the source and packages the web service as a JAR'
-    baseName = 'oeq-blackboard-primary-ws'
+    archiveBaseName = 'oeq-blackboard-primary-ws'
     with jar
     from (project(':oeqCommon').sourceSets.main.output) // Include the common classes as well.
     from ('src/main/manifests/bb-manifest.xml'){ // set the B2 version and place in the war
