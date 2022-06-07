@@ -61,6 +61,7 @@ import java.util.Properties;
 public class Fixer {
   public static final String EXECUTE = "execute";
   public static final String DRYRUN = "dryrun";
+  public static final String WEBLINKS = "weblinks";
   public static final String RESET = "reset";
   public static final String COURSEID = "courseId";
   public static final String PLACEMENT = "placementhandle";
@@ -81,6 +82,7 @@ public class Fixer {
   protected boolean started;
   protected boolean errored;
   protected String dryrunStr;
+  protected String weblinksStr;
   protected int percent;
   protected int lookedAt;
   protected int equellaLookedAt;
@@ -151,6 +153,8 @@ public class Fixer {
 	imageUrlCsv = request.getParameter(IMAGE_URL_CSV);
 	final boolean dryrun = request.getParameter(DRYRUN) != null;
 	dryrunStr = dryrun ? "DRY RUN MODE:  " : "";
+	final boolean weblinks = request.getParameter(WEBLINKS) != null;
+	weblinksStr = weblinks ? "WEB LINKS MODE:  " : "";
 
 	final boolean execute = request.getParameter(EXECUTE) != null;
 
@@ -174,8 +178,11 @@ public class Fixer {
 			equellaLookedAt = 0;
 			fixedItems = 0;
 			try {
-			  if(dryrun) {
+			  if (dryrun) {
 				utils.log(0, dryrunStr + "No changes to the content will be performed");
+			  }
+			  if (weblinks) {
+				utils.log(0, weblinksStr + "Web links will be created instead LTI links");
 			  }
 			  imageUrlsToScrub = imageUrlCsv.split(",");
 			  utils.log(0, "Config - Image URLs: [" + Arrays.toString(imageUrlsToScrub) + "]");
@@ -183,24 +190,26 @@ public class Fixer {
 			  utils.log(0, "Config - CourseID: " + courseId + "]");
 
 			  BasicLTIPlacement placement = null;
+			  if (!weblinks) {
+				utils.log(0, "Loading placement...");
+				try {
+				  placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
+				} catch (KeyNotFoundException ex) {
+				  utils.log(1, "---------------------------------------------------");
+				  utils.log(1, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
+				  started = false;
+				  completed = false;
+				  errored = true;
+				  throw ex;
+				}
 
-			  utils.log(0, "Loading placement...");
-			  try {
-			  	placement = BasicLTIPlacementManager.Factory.getInstance().loadByHandle(placementHandle);
-			  } catch (KeyNotFoundException ex) {
-				utils.log(1, "---------------------------------------------------");
-				utils.log(1, "An error occurred: The placement handle does not exist. Please introduce a valid placement handle code");
-				started = false;
-				completed = false;
-				errored = true;
-				throw ex;
+				utils.log(1, "Name: " + placement.getName());
+				utils.log(1, "Url: " + placement.getUrl());
+				utils.log(1, "Handle: " + placement.getHandle());
+				utils.log(1, "Id: " + placement.getId().toExternalString());
+
+				mapToString(placement.getCustomParameters(), 0, "placement parameters");
 			  }
-			  utils.log(1, "Name: " + placement.getName());
-			  utils.log(1, "Url: " + placement.getUrl());
-			  utils.log(1, "Handle: " + placement.getHandle());
-			  utils.log(1, "Id: " + placement.getId().toExternalString());
-
-			  mapToString(placement.getCustomParameters(), 0, "placement parameters");
 			  BbList courseList = new BbList();
 			  if (StringUtils.isNotEmpty(courseId) && courseDbLoader.doesCourseIdExist(courseId)) {
 				courseList.add(courseDbLoader.loadByCourseId(courseId));
@@ -229,9 +238,10 @@ public class Fixer {
 				BbList courseTocs = courseTocDbLoader.loadByCourseId(course.getId());
 				for (int j = 0; j < courseTocs.size(); j++) {
 				  CourseToc courseToc = (CourseToc) courseTocs.get(j);
-
+				  String placementIdExternalString = null;
+				  if (!weblinks) placementIdExternalString = placement.getId().toExternalString();
 				  recurseContent(contentDbLoader, courseToc, course,
-					getChildren(contentDbLoader, courseToc.getContentId()), placement.getId().toExternalString(), 0, dryrun);
+					getChildren(contentDbLoader, courseToc.getContentId()), placementIdExternalString, 0, dryrun, weblinks);
 				}
 
 				utils.log(0, "Finished review of course '" + course.getTitle() + "' ("
@@ -256,7 +266,7 @@ public class Fixer {
 	}
   }
 
-  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, Course course, BbList contentList, String placementExternalId, int level, boolean dryrun)
+  protected void recurseContent(ContentDbLoader contentLoader, CourseToc courseToc, Course course, BbList contentList, String placementExternalId, int level, boolean dryrun, boolean weblinks)
 	throws Exception {
 	for (int j = 0; j < contentList.size(); j++) {
 
@@ -271,7 +281,7 @@ public class Fixer {
 		prettyPrint(level, content, "content to migrate");
 
 		try {
-		  fixContent(courseToc, course, content, level, placementExternalId, dryrun);
+		  fixContent(courseToc, course, content, level, placementExternalId, dryrun, weblinks);
 		  prettyPrint(level, content, dryrunStr + "migrated content");
 
 		} catch (Exception ex) {
@@ -281,7 +291,7 @@ public class Fixer {
 		prettyPrint(level, content, "content with unknown handle (unable to migrate)");
 
 	  }
-	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1, dryrun);
+	  recurseContent(contentLoader, courseToc, course, getChildren(contentLoader, content.getId()), placementExternalId, level + 1, dryrun, weblinks);
 	}
   }
 
@@ -301,7 +311,7 @@ public class Fixer {
 	return contentLoader.loadChildren(bbContentId);
   }
 
-  private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId, boolean dryrun) throws Exception {
+  private void fixContent(CourseToc courseToc, Course course,  Content ltiContent, int level, String placementExternalId, boolean dryrun, boolean weblinks) throws Exception {
 	utils.log(level, "Link migration notes for " + ltiContent.getTitle());
 	equellaLookedAt++;
 
@@ -343,6 +353,9 @@ public class Fixer {
 
 	// Update the URL
 	ltiContent.setUrl(fixerResponse.getNewUrl());
+	if (weblinks){
+	  utils.log(level+1, "Creating weblink with this url: " + fixerResponse.getNewUrl());
+	}
 
 	// Update the Host
 	String newUrlHost = FixerUtils.getDomainName(equellaURL);
@@ -353,7 +366,11 @@ public class Fixer {
 	ltiContent.setBody(new FormattedText(fixerResponse.getNewBody(),FormattedText.Type.HTML));
 
 	// Update link type
-	ltiContent.setContentHandler("resource/x-bb-blti-link");
+	if (!weblinks) {
+	  ltiContent.setContentHandler("resource/x-bb-blti-link");
+	} else {
+	  ltiContent.setContentHandler("resource/x-bb-externallink");
+	}
 
 	// Update link name if Bb link title is empty
 	if(StringUtils.isEmpty(ltiContent.getTitle())) {
@@ -367,13 +384,15 @@ public class Fixer {
 	}
 
 	// Update the extended data
-	Map<String, String> values = new HashMap<>();
-	values.put("customParameters", "");
-	values.put("cimPlacementId", placementExternalId);
-	utils.log(level+1, "PlacementId: " + placementExternalId);
-	values.put("itemOrigin", "CIM");
-	extendedData.setValues(values);
-	mapToString(values,level+1, "New Extended Data");
+	if (!weblinks) {
+	  Map<String, String> values = new HashMap<>();
+	  values.put("customParameters", "");
+	  values.put("cimPlacementId", placementExternalId);
+	  utils.log(level + 1, "PlacementId: " + placementExternalId);
+	  values.put("itemOrigin", "CIM");
+	  extendedData.setValues(values);
+	  mapToString(values,level+1, "New Extended Data");
+	}
 
 	// persist it
 	if (dryrun) {

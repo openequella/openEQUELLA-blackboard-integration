@@ -92,6 +92,12 @@
                 <input type="checkbox" name="<%=Fixer.DRYRUN%>" />
               </ui:dataElement>
           </ui:step>
+
+          <ui:step title="External Web Links">
+            <ui:dataElement label="Check this box to convert the Open Equella links to standard Blackboard External web Links instead of LTI links">
+              <input type="checkbox" name="<%=Fixer.WEBLINKS%>" />
+            </ui:dataElement>
+          </ui:step>
         <%
 				}
 				%>
